@@ -2243,23 +2243,6 @@
             selectLibraryDomain(categoryKey);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-            document.getElementById('count-sub-juris').innerText = catLaws.filter(l => l.type === 'jurisprudence').length;
-
-            setCategorySubFilter('all', false);
-            renderCategoryLawsList(catLaws);
-
-            const views = ['home', 'category', 'chat', 'sources', 'bookmarks', 'settings'];
-            views.forEach(v => {
-                const el = document.getElementById(`view-${v}`);
-                if (el) {
-                    if (v === 'category') el.classList.remove('hidden');
-                    else el.classList.add('hidden');
-                }
-            });
-            const currentViewEl = document.getElementById('view-category');
-            if (currentViewEl) currentViewEl.scrollTop = 0;
-            window.scrollTo(0, 0);
-        }
 
         function closeCategoryPage() {
             document.getElementById('view-category').classList.add('hidden');
