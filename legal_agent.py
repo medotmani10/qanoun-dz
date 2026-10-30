@@ -66,7 +66,7 @@ def call_gemini(prompt=None, system_instruction=None, allow_arabic=True, content
     payload = {
         "contents": contents,
         "generationConfig": {
-            "temperature": 0.1,
+            "temperature": 0.0,
             "maxOutputTokens": 1200
         }
     }
@@ -241,6 +241,46 @@ Mots-clés en français:"""
     kw_clean = re.sub(r'[^a-zA-Z0-9\sàâéèêîôùûç-]', ' ', kw).strip()
     return kw_clean
 
+import html
+
+def needs_web_search(query):
+    """Detects whether user is asking for practical dossiers, administrative procedures, or portal links."""
+    q = query.lower()
+    triggers = [
+        'dossier', 'ملف', 'وثائق', 'أوراق', 'pieces', 'documents', 'pièces',
+        'ijraat', 'ijra2at', 'إجراءات', 'خطوات', 'process', 'procedure', 'procédure',
+        'etapes', 'étapes', 'kifech ndir', 'comment faire', 'demarches', 'démarches',
+        'site', 'plateforme', 'bawaba', 'موقع', 'بوابة', 'رابط', 'en ligne',
+        'ana.dz', 'anae', 'casnos', 'cnas', 'cnrc', 'aapi', 'aadl'
+    ]
+    return any(t in q for t in triggers)
+
+def search_algerian_web(query, max_results=3):
+    """Targeted web search for Algerian administrative procedures, dossiers, and official portal guidelines."""
+    try:
+        data = urllib.parse.urlencode({'q': query}).encode('utf-8')
+        req = urllib.request.Request(
+            'https://lite.duckduckgo.com/lite/',
+            data=data,
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            raw_html = resp.read().decode('utf-8', errors='ignore')
+
+        results = []
+        links = re.findall(r'<a[^>]+href=[\'\"]([^\'\"]+)[\'\"][^>]*class=[\'\"]result-link[\'\"][^>]*>(.*?)</a>', raw_html, re.DOTALL)
+        snippets = re.findall(r'<td[^>]+class=[\'\"]result-snippet[\'\"][^>]*>(.*?)</td>', raw_html, re.DOTALL)
+        
+        for i in range(min(len(links), len(snippets), max_results)):
+            link_url, title_raw = links[i]
+            snip_raw = snippets[i]
+            title = html.unescape(re.sub(r'<[^>]+>', '', title_raw).strip())
+            snippet = html.unescape(re.sub(r'<[^>]+>', '', snip_raw).strip())
+            results.append({'title': title, 'snippet': snippet, 'url': link_url})
+        return results
+    except Exception:
+        return []
+
 # ========================================================
 # USER PERSONAS & PROFILES ARCHITECTURE
 # ========================================================
@@ -332,13 +372,25 @@ def ask_legal_agent(user_query, lang="ar", history=None, user_id="default_user",
     articles = []
     jurisprudence = []
     if keywords:
-        articles = search_legal_db(keywords, limit=3)
+        articles = search_legal_db(keywords, limit=5)
         jurisprudence = search_jurisprudence(keywords, limit=2)
 
     if not articles and len(search_query) > 5:
-        articles = search_legal_db(search_query, limit=3)
+        articles = search_legal_db(search_query, limit=5)
     if not jurisprudence and len(search_query) > 5:
         jurisprudence = search_jurisprudence(search_query, limit=2)
+
+    # Targeted Web Search for practical administrative processes, dossiers & official portals
+    web_results = []
+    web_str = ""
+    if needs_web_search(user_query_clean) or (len(articles) == 0 and len(user_query_clean) > 8):
+        search_term = keywords if keywords else user_query_clean
+        web_query = f"{search_term} algerie dossier procedure"
+        web_results = search_algerian_web(web_query, max_results=3)
+        if not web_results and len(keywords) > 0:
+            web_results = search_algerian_web(f"{keywords} algerie", max_results=3)
+        if web_results:
+            web_str = "\n".join([f"- **{w['title']}:** {w['snippet']} ({w['url']})" for w in web_results])
         
     context_str = ""
     for i, a in enumerate(articles, 1):
@@ -378,18 +430,21 @@ def ask_legal_agent(user_query, lang="ar", history=None, user_id="default_user",
 - احسب الآجال الإجرائية (آجال الاستئناف 15 أو 30 يوماً، المعارضة 10 أيام، الطعن بالنقض شهرين، التقادم، مدة عقود العمل والإيجار) انطلاقاً من تاريخ اليوم أو التواريخ المذكورة في سؤاله.
 - اعتبر دائماً أن أحدث قانون مالية ساري المفعول حالياً هو قانون المالية لسنة {current_year}، وأن أحدث التعديلات التشريعية (مثل تعديلات {current_year}) هي السارية المفعول.
 
-قواعد صارمة للإجابة والتفاعل الإنساني الذكي:
-1. التفاعل الطبيعي والحيوي (ممنوع منعاً باتاً الردود الآلية المبرمجة أو القوالب الجاهزة أو التكرار):
+قواعد صارمة للإجابة والتفاعل ومنع الاختلاق (Strict Anti-Hallucination):
+1. الالتزام الصارم بالحقائق ومنع اختلاق أرقام أو نصوص وهمية:
+   - ممنوع منعاً باتاً اختراع أرقام مواد، أو نسب مئوية، أو مبالغ جزافية، أو تواريخ مراسيم غير مؤكدة في السند المرفق أو القانون الجزائري الساري.
+   - في المسائل التي لم يحدد فيها المشرع مبلغاً ثابتاً (مثل نفقة الأطفال، بدل سكن الحضانة، أو التعويض عن الضرر)، وضّح أن تقديرها متروك للسلطة التقديرية للقاضي بناءً على دخل الأب ومستوى المعيشة (المادة 79 من قانون الأسرة مثلاً)، دون اختراع مبلغ وهمي.
+   - إذا سأل المستخدم عن ملف إداري أو وثائق مطلوبة (Dossier / Pièces à fournir / Démarches) أو خطوات عملية وبروسيس: استند إلى معلومات الويب الرسمية والممارسات الإدارية الجزائرية الحقيقية واذكر الوثائق الأساسية بوضوح وترتيب عملي، واذكر المنصة أو الموقع الرسمي المعتمد (مثل ana.dz، cnrc.org.dz، وغيرها).
+   - ممنوع الخلط بين القانون الجزائري وقوانين الدول الأخرى (مثل مصر، فرنسا، أو المغرب).
+
+2. التفاعل الطبيعي والحيوي:
    - تفاعل بذكاء، حيوية وبشكل إنساني طبيعي مع رسالة المستخدم.
    - إذا كان كلام المستخدم تحية أو دردشة أو سؤالاً عن الوقت/التاريخ: رد عليه بأسلوب لبق وطبيعي واذكر له التاريخ إذا طلبه.
    - إذا تحدث المستخدم بالدارجة الجزائرية (عربيزي أو أحرف لاتينية) أو الفرنسية أو العربية الفصحى: تفاعل معه بسلاسة بنفس لغته وسياقه الطبيعي.
 
-2. في الاستشارات والمسائل القانونية وحساب الآجال:
-   - قدّم جواباً قانونياً مباشراً، مركزاً وواضحاً ومفيداً عملياً دون إطالة إنشائية لا فائدة منها.
-   - اذكر الرقم، الأجل، المبالغ بالدينار (DA)، أو رقم المادة بدقة إن وجدت، مع توضيح التاريخ النهائي للأجل (Date limite) بحسابه من تاريخ اليوم ({current_date_iso}).
-   - استند دائماً إلى نصوص التشريع الجزائري الساري واجتهادات المحكمة العليا إن وُجدت، واختم جوابك بذكر المصدر الرسمي بدقة:
-     ---
-     📌 **المصدر:** [اسم القانون أو المرسوم، رقم المادة / الجريدة الرسمية / قرار المحكمة العليا].
+3. ذكر المصدر الرسمي بدقة في الأسفل:
+   ---
+   📌 **المصدر:** [اسم القانون أو المرسوم، رقم المادة / الجريدة الرسمية / المنصة الرسمية المعتمدة].
 """
 
     user_prompt = f"""رسالة واستفسار المستخدم:
@@ -399,9 +454,10 @@ def ask_legal_agent(user_query, lang="ar", history=None, user_id="default_user",
 
 {f"النصوص القانونية الرسمية من قاعدة البيانات:\n{context_str}" if context_str else ""}
 {f"اجتهادات المحكمة العليا:\n{jurisprudence_str}" if jurisprudence_str else ""}
+{f"معلومات إجرائية وملفات إدارية من المواقع والويب الجزائري:\n{web_str}" if web_str else ""}
 {f"سياق سابق للمستخدم: {memory_str}" if memory_str else ""}
 
-أجب بذكاء وطبيعية وبشكل مباشر، مع مراعاة تاريخ اليوم ({current_date_ar}) وحساب أي آجال أو قوانين سارية بدقة."""
+أجب بذكاء وطبيعية وبشكل مباشر، مع الالتزام التام بالحقائق وتفصيل الوثائق أو الإجراءات المطلوبة إن سأل عنها."""
 
     # Build multi-turn contents for Gemini
     gemini_contents = []
@@ -429,6 +485,7 @@ def ask_legal_agent(user_query, lang="ar", history=None, user_id="default_user",
         "keywords": keywords,
         "articles": articles,
         "jurisprudence": jurisprudence,
+        "web_results": web_results,
         "recalled_memories": recalled_mems if 'recalled_mems' in locals() else [],
         "answer": reply
     }
