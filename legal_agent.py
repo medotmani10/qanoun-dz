@@ -19,6 +19,17 @@ import urllib.request
 import urllib.error
 
 API_KEY = os.environ.get("GEMINI_API_KEY", "")
+if not API_KEY:
+    env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    if os.path.exists(env_file):
+        try:
+            with open(env_file, "r", encoding="utf-8") as _ef:
+                for _line in _ef:
+                    if _line.strip().startswith("GEMINI_API_KEY="):
+                        API_KEY = _line.strip().split("=", 1)[1].strip()
+                        break
+        except Exception:
+            pass
 MODEL_GEN = "gemini-3.5-flash-lite"
 MODEL_EMB = "gemini-embedding-2"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -230,44 +241,6 @@ Mots-clés en français:"""
     kw_clean = re.sub(r'[^a-zA-Z0-9\sàâéèêîôùûç-]', ' ', kw).strip()
     return kw_clean
 
-def is_casual_or_greeting(text):
-    """Detects simple greetings, courtesies, and casual phrases."""
-    if not text:
-        return True
-    t = text.strip().lower()
-    clean = re.sub(r'[^\w\s]', ' ', t).strip()
-    words = clean.split()
-    if not words:
-        return True
-    
-    # Substantive legal trigger words: if present, it is definitely a legal question
-    legal_triggers = {
-        'قانون', 'مادة', 'مرسوم', 'عقد', 'طلاق', 'نفقة', 'بناء', 'رخصة', 'تسريح', 'طرد',
-        'عمل', 'أجر', 'راتب', 'غرامة', 'مخالفة', 'جنحة', 'جناية', 'سجن', 'حبس', 'محكمة',
-        'قاضي', 'عريضة', 'استئناف', 'طعن', 'نقض', 'شراء', 'بيع', 'ملكية', 'أرض', 'عقار',
-        'شقة', 'ورثة', 'تركة', 'ميراث', 'شركة', 'ضرائب', 'ضريبة', 'سجل', 'تجاري', 'مقاول',
-        'كراء', 'إيجار', 'تأمين', 'شهادة', 'توثيق', 'موثق', 'محضر', 'قضائي', 'حادث',
-        'droit', 'loi', 'article', 'decret', 'contrat', 'divorce', 'pension', 'permis',
-        'licenciement', 'salaire', 'amende', 'tribunal', 'appel', 'cassation', 'foncier',
-        'terrain', 'heritage', 'sarl', 'taxe', 'impot', 'location', 'notaire', 'autoentrepreneur'
-    }
-    if any(w in legal_triggers for w in words):
-        return False
-        
-    greeting_tokens = {
-        'salam', 'salem', 'slm', 'bonjour', 'bonsoir', 'salut', 'cc', 'coucou',
-        'hello', 'hi', 'hey', 'kifech', 'labas', 'cv', 'merci', 'chokran', 'saha',
-        'sa7a', 'salamoualikoum', 'salamou', 'alikoum', 'alaykom',
-        'سلام', 'السلام', 'عليكم', 'ورحمة', 'وبركاته', 'أهلا', 'اهلا', 'مرحبا',
-        'صباح', 'مساء', 'الخير', 'النور', 'شكرا', 'عفوا', 'يعطيك', 'الصحة',
-        'بارك', 'الله', 'فيك', 'شكون', 'نتا', 'انت', 'لباس', 'واش', 'راك'
-    }
-    greeting_matches = sum(1 for w in words if w in greeting_tokens)
-    if greeting_matches >= 1 and (len(words) <= 7 or greeting_matches / len(words) >= 0.5):
-        return True
-        
-    return False
-
 # ========================================================
 # USER PERSONAS & PROFILES ARCHITECTURE
 # ========================================================
@@ -276,11 +249,9 @@ PERSONA_PROFILES = {
         'id': 'citoyen',
         'title': 'مواطن عادي (Particulier)',
         'icon': '👤',
-        'greeting': 'وعليكم السلام ورحمة الله وبركاته! أهلاً بك، تفضل بطرح استفسارك القانوني وأنا في الخدمة.',
-        'greeting_latin': 'Wa 3alaykom essalam! Marhba bik, tfe7del b sou\'alek l-9anouni w ana f l-khedma.',
         'instruction': (
             "صفة وهوية المستخدم: مواطن عادي (مستهلك، ساكن، مشتري).\n"
-            "- خاطبه بلغة عربية مبسطة جداً، واضحة ومباشرة دون تعقيد أو مصطلحات فقهية غامضة.\n"
+            "- خاطبه بلغة مبسطة وواضحة جداً ومباشرة دون تعقيد أو مصطلحات فقهية غامضة.\n"
             "- ركز على حماية حقوقه اليومية والخطوات الملموسة البسيطة التي يجب أن يقوم بها."
         )
     },
@@ -288,8 +259,6 @@ PERSONA_PROFILES = {
         'id': 'commercant',
         'title': 'مقاول / تاجر (Entrepreneur)',
         'icon': '💼',
-        'greeting': 'وعليكم السلام ورحمة الله! مرحباً بك، تفضل بأي استشارة تجارية، ضريبية أو قانونية لمشروعك وأنا في الخدمة.',
-        'greeting_latin': 'Wa 3alaykom essalam! Marhba bik, tfe7del b ay istichara tijariya wla daribiya l machrou3ek.',
         'instruction': (
             "صفة وهوية المستخدم: تاجر أو مقاول أو صاحب مشروع (مؤسسة مصغرة / مقاول ذاتي).\n"
             "- ركز على الأثر التجاري والمالي، الضرائب والرسوم (IFU/IBS/TVA)، التزامات السجل التجاري، والعقود والآجال البنكية والتعاقدية.\n"
@@ -300,8 +269,6 @@ PERSONA_PROFILES = {
         'id': 'salarie',
         'title': 'عامل / موظف (Salarié / Fonctionnaire)',
         'icon': '🛠️',
-        'greeting': 'وعليكم السلام ورحمة الله! مرحباً بك، تفضل بأي سؤال حول حقوق العمل، الوظيفة أو الضمان الاجتماعي وأنا في الخدمة.',
-        'greeting_latin': 'Wa 3alaykom essalam! Marhba bik, tfe7del b ay sou\'al f 9anoun l-3amal w CNAS w ana f l-khedma.',
         'instruction': (
             "صفة وهوية المستخدم: عامل أو موظف أجير (قطاع اقتصادي أو وظيفة عمومية).\n"
             "- ركز على حماية حقوقه وفق قانون علاقات العمل 90-11 أو القانون الأساسي العام للوظيفة العمومية.\n"
@@ -312,8 +279,6 @@ PERSONA_PROFILES = {
         'id': 'juriste',
         'title': 'محامي / رجل قانون (Avocat / Juriste)',
         'icon': '⚖️',
-        'greeting': 'أهلاً بالأستاذ الزميل، وعليكم السلام ورحمة الله وبركاته! تفضل بالمسألة أو النص القانوني المطلوب بحثه وسنناقشه بدقة.',
-        'greeting_latin': 'Ahla b l-ostadh l-zamil, wa 3alaykom essalam! Tfe7del b l-mas\'ala l-9anouniya bach n-na9chouha b di99a.',
         'instruction': (
             "صفة وهوية المستخدم: محامٍ، قاضٍ، مستشار قانوني، أو طالب وباحث حقوقي متخصص.\n"
             "- تحدث معه بلغة فقهية وقضائية متخصصة ودقيقة جداً تليق بالزملاء في سلك القضاء والمحاماة.\n"
@@ -322,47 +287,17 @@ PERSONA_PROFILES = {
     }
 }
 
-def get_quick_greeting_reply(text, persona="citoyen"):
-    """Returns an ultra-short, natural 1-sentence live chat greeting tailored to user persona."""
-    t = text.strip().lower()
-    p_info = PERSONA_PROFILES.get(persona, PERSONA_PROFILES['citoyen'])
-    
-    if any(w in t for w in ['bonjour', 'bonsoir', 'salut', 'coucou']):
-        return "Bonjour et bienvenue ! Comment puis-je vous aider aujourd'hui sur le plan juridique ?"
-    if any(w in t for w in ['hello', 'hi', 'hey']):
-        return "Hello and welcome! How can I assist you with Algerian legal matters today?"
-    if any(w in t for w in ['شكرا', 'شكر', 'يعطيك الصحة', 'بارك الله', 'merci', 'chokran', 'sa7a']):
-        return "العفو، أنا دائماً في الخدمة! بالتوفيق."
-    if any(w in t for w in ['salem', 'salam', 'slm', 'kifech']) and not any('\u0600' <= c <= '\u06FF' for c in text):
-        return p_info['greeting_latin']
-    return p_info['greeting']
-
 def ask_legal_agent(user_query, lang="ar", history=None, user_id="default_user", persona="citoyen"):
     """
-    Main agent pipeline:
+    Main agent pipeline - 100% Dynamic AI (Zero canned or automated responses):
     - User Persona adaptation (citoyen, commercant, salarie, juriste).
-    - Ultra-short, instant 1-sentence live greeting.
-    - Concise, direct legal answers without long essays or fluff.
-    - Cites official legal source at bottom.
+    - Natural, intelligent legal consultation powered by Gemini + RAG.
+    - Cites official legal source at bottom when legal context applies.
     """
     user_query_clean = user_query.strip()
     persona_key = persona if persona in PERSONA_PROFILES else 'citoyen'
     p_info = PERSONA_PROFILES[persona_key]
-    
-    # 1. Casual Greeting / Small Talk Flow (Instant 1-sentence response tailored to persona)
-    if is_casual_or_greeting(user_query_clean):
-        reply = get_quick_greeting_reply(user_query_clean, persona=persona_key)
-        return {
-            "query": user_query,
-            "persona": persona_key,
-            "keywords": "",
-            "articles": [],
-            "jurisprudence": [],
-            "recalled_memories": [],
-            "answer": reply
-        }
 
-    # 2. Substantive Legal Inquiry Flow
     # Contextualize search query with previous turn if follow-up
     search_query = user_query_clean
     if history and isinstance(history, list) and len(history) > 0:
@@ -375,12 +310,15 @@ def ask_legal_agent(user_query, lang="ar", history=None, user_id="default_user",
     keywords = extract_legal_keywords(search_query)
     
     # Retrieve relevant articles & jurisprudence
-    articles = search_legal_db(keywords, limit=3)
-    if not articles:
+    articles = []
+    jurisprudence = []
+    if keywords:
+        articles = search_legal_db(keywords, limit=3)
+        jurisprudence = search_jurisprudence(keywords, limit=2)
+
+    if not articles and len(search_query) > 5:
         articles = search_legal_db(search_query, limit=3)
-        
-    jurisprudence = search_jurisprudence(keywords, limit=2)
-    if not jurisprudence:
+    if not jurisprudence and len(search_query) > 5:
         jurisprudence = search_jurisprudence(search_query, limit=2)
         
     context_str = ""
@@ -409,35 +347,32 @@ def ask_legal_agent(user_query, lang="ar", history=None, user_id="default_user",
     if recalled_mems:
         memory_str = "\n".join(f"- [{m['category']}] {m['fact']}" for m in recalled_mems)
 
-    sys_instruction = f"""أنت مستشار ومحامي قانوني جزائري ذكي، تجيب في محادثة مباشرة وحية (Live Chat).
+    sys_instruction = f"""أنت مستشار قانوني ومحامي جزائري ذكي وخبير في التشريع الجزائري الساري، تجيب في محادثة مباشرة وحية (Live Chat).
 
 {p_info['instruction']}
 
-قواعد صارمة للإيجاز والدقة (ممنوع الإطالة بتاتاً):
-1. إجابة قصيرة، مباشرة وموجزة جداً (أقل من 60 إلى 90 كلمة فقط):
-   - ادخل في صلب الجواب فوراً دون أي مقدمات إنشائية بأسلوب يناسب صفة المستخدم ({p_info['title']}).
-   - اشرح الحكم أو الخطوة في جملتين أو ثلاث جمل مركزة ومباشرة.
-   - اذكر الرقم، الأجل، أو المبلغ بالدينار (DA) بدقة داخل الشرح إن وجد.
-   - ممنوع التكرار، ممنوع السرد الإنشائي الطويل، وممنوع القوالب المبرمجة.
+قواعد صارمة للإجابة والتفاعل الإنساني الذكي:
+1. التفاعل الطبيعي والحيوي (ممنوع منعاً باتاً الردود الآلية المبرمجة أو القوالب الجاهزة أو التكرار):
+   - تفاعل بذكاء، حيوية وبشكل إنساني طبيعي مع رسالة المستخدم.
+   - إذا كان كلام المستخدم تحية أو دردشة أو كلاماً عاماً: رد عليه بأسلوب لبق وطبيعي واعرض مساعدتك القانونية المتخصصة دون قوالب جامدة.
+   - إذا تحدث المستخدم بالدارجة الجزائرية (عربيزي أو أحرف لاتينية) أو الفرنسية أو العربية الفصحى: تفاعل معه بسلاسة بنفس لغته وسياقه الطبيعي.
 
-2. ذكر المصدر القانوني في الأسفل:
-   - اختم رسالتك دائماً بسطر فاصل ثم المصدر الرسمي بدقة:
-   ---
-   📌 **المصدر:** [اسم القانون أو المرسوم، رقم المادة / الجريدة الرسمية].
+2. في الاستشارات والمسائل القانونية:
+   - قدّم جواباً قانونياً مباشراً، مركزاً وواضحاً ومفيداً عملياً دون إطالة إنشائية لا فائدة منها.
+   - اذكر الرقم، الأجل، المبالغ بالدينار (DA)، أو رقم المادة بدقة إن وجدت.
+   - استند دائماً إلى نصوص التشريع الجزائري الساري واجتهادات المحكمة العليا إن وُجدت، واختم جوابك بذكر المصدر الرسمي بدقة:
+     ---
+     📌 **المصدر:** [اسم القانون أو المرسوم، رقم المادة / الجريدة الرسمية / قرار المحكمة العليا].
 """
 
-    user_prompt = f"""سؤال واستشارة المستخدم:
+    user_prompt = f"""رسالة واستفسار المستخدم:
 "{user_query}"
 
-النصوص القانونية الرسمية:
-{context_str if context_str else "استند لمعلومات التشريع الجزائري الساري المفعول."}
-
-اجتهادات المحكمة العليا إن وجدت:
-{jurisprudence_str if jurisprudence_str else ""}
-
+{f"النصوص القانونية الرسمية من قاعدة البيانات:\n{context_str}" if context_str else ""}
+{f"اجتهادات المحكمة العليا:\n{jurisprudence_str}" if jurisprudence_str else ""}
 {f"سياق سابق للمستخدم: {memory_str}" if memory_str else ""}
 
-أجب بإيجاز شديد وبشكل مباشر وواضح (بين 3 إلى 5 أسطر فقط)، ثم اذكر المصدر في الأسفل."""
+أجب بذكاء وطبيعية وبشكل مباشر دون أي ردود آلية أو قوالب مسبقة."""
 
     # Build multi-turn contents for Gemini
     gemini_contents = []
