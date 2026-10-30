@@ -14,6 +14,7 @@ import os
 import sys
 from legal_agent import ask_legal_agent
 from legal_memory import global_memory
+import library_service
 
 PORT = int(os.environ.get("PORT", 8080))
 
@@ -582,6 +583,12 @@ class LegalRequestHandler(http.server.BaseHTTPRequestHandler):
         except Exception as e:
             return None, f'Malformed JSON: {e}'
 
+    def do_HEAD(self):
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
+        self.send_cors_headers()
+        self.end_headers()
+
     def do_GET(self):
         clean_path = urllib.parse.unquote(self.path.split('?')[0]).lstrip('/')
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -628,7 +635,11 @@ class LegalRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.end_headers()
                 return
 
-        if self.path == '/' or self.path == '/index.html':
+        parsed_url = urllib.parse.urlparse(self.path)
+        path_only = parsed_url.path
+        qs = urllib.parse.parse_qs(parsed_url.query)
+
+        if path_only == '/' or path_only == '/index.html':
             app_file = os.path.join(base_dir, 'index.html')
             if os.path.exists(app_file):
                 with open(app_file, 'rb') as fp:
@@ -647,7 +658,7 @@ class LegalRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_cors_headers()
             self.end_headers()
             self.wfile.write(HTML_PAGE.encode('utf-8'))
-        elif self.path == '/preview':
+        elif path_only == '/preview':
             preview_file = os.path.join(base_dir, 'index.html')
             if os.path.exists(preview_file):
                 with open(preview_file, 'rb') as fp:
@@ -663,11 +674,33 @@ class LegalRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_cors_headers()
                 self.end_headers()
                 self.wfile.write(b'Aucun apercu genere pour le moment.')
-        elif self.path.startswith('/api/memory'):
+        elif path_only.startswith('/api/memory'):
             mems = global_memory.get_all('default_user')
             self.send_json_response(200, {'status': 'ok', 'memories': mems})
-        elif self.path == '/api/status':
-            self.send_json_response(200, {'status': 'ok', 'laws_count': 37, 'joradp_years': 59})
+        elif path_only == '/api/status':
+            self.send_json_response(200, {'status': 'ok', 'laws_count': 59, 'articles_count': 6012, 'jurisprudence_count': 89})
+        elif path_only == '/api/library/overview':
+            ov = library_service.get_library_overview()
+            self.send_json_response(200, ov)
+        elif path_only == '/api/library/laws':
+            dom = qs.get('domain', [None])[0]
+            search = qs.get('search', [None])[0]
+            laws_data = library_service.get_library_laws(dom, search)
+            self.send_json_response(200, laws_data)
+        elif path_only == '/api/library/articles':
+            law_title = qs.get('law_title', [None])[0]
+            dom = qs.get('domain', [None])[0]
+            search = qs.get('search', [None])[0]
+            limit = int(qs.get('limit', ['25'])[0])
+            offset = int(qs.get('offset', ['0'])[0])
+            arts_data = library_service.get_library_articles(law_title, dom, search, limit, offset)
+            self.send_json_response(200, arts_data)
+        elif path_only == '/api/library/jurisprudence':
+            search = qs.get('search', [None])[0]
+            limit = int(qs.get('limit', ['20'])[0])
+            offset = int(qs.get('offset', ['0'])[0])
+            juris_data = library_service.get_library_jurisprudence(search, limit, offset)
+            self.send_json_response(200, juris_data)
         else:
             self.send_response(404)
             self.send_cors_headers()

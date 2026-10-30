@@ -540,124 +540,143 @@
 
 
         <!-- ======================================================== -->
-        <!-- SCREEN 3: المصادر والمكتبة (SOURCES & JORADP)             -->
+        <!-- SCREEN 3: المكتبة القانونية الوطنية (DIGITAL LAW LIBRARY) -->
         <!-- ======================================================== -->
         <main id="view-sources" class="flex-1 flex flex-col pb-24 overflow-y-auto hidden">
             
-            <!-- Sources Header with Grand Law Library Photographic Visual -->
+            <!-- Library Header with Photographic Visual & Real KPIs -->
             <header class="relative text-white px-5 pt-4 pb-5 rounded-b-3xl shadow-lg overflow-hidden">
-                <img src="/assets/library_legal.jpg" alt="المكتبة والمصادر القانونية" class="absolute inset-0 w-full h-full object-cover object-center" />
+                <img src="/assets/library_legal.jpg" alt="المكتبة القانونية الوطنية" class="absolute inset-0 w-full h-full object-cover object-center" />
                 <div class="absolute inset-0 bg-gradient-to-b from-[#0F4325]/92 via-[#0F4325]/85 to-[#0b331c]/95 backdrop-blur-[0.5px]"></div>
                 <div class="relative z-10">
-                <div class="flex items-center justify-between mb-3">
-                    <button onclick="switchTab('home')" class="p-1 -mr-1 text-slate-200 hover:text-white">
-                        <svg class="w-5 h-5 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                    </button>
-                    <h1 class="text-sm font-bold">المكتبة والمصادر القانونية</h1>
-                    <button class="p-1 text-slate-200 hover:text-white">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
-                    </button>
-                </div>
+                    <div class="flex items-center justify-between mb-3">
+                        <button onclick="switchTab('home')" class="p-1 -mr-1 text-slate-200 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center">
+                            <svg class="w-5 h-5 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <div class="text-center">
+                            <h1 class="text-sm font-bold">المكتبة القانونية الوطنية</h1>
+                            <div class="text-[10px] text-emerald-200 font-medium">مستودع القوانين الجزائرية الموحدة والاجتهادات القضائية</div>
+                        </div>
+                        <button onclick="refreshLibraryOverview(true)" class="p-1 text-slate-200 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center" title="تحديث البيانات">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        </button>
+                    </div>
 
-                <!-- 4 KPI Metrics Grid -->
-                <div class="grid grid-cols-4 gap-2 text-center mt-3">
-                    <div class="bg-white/10 rounded-xl p-2 border border-white/10">
-                        <div class="text-xs font-black text-amber-300">1</div>
-                        <div class="text-[9px] text-emerald-100 font-bold">الدستور 2020</div>
-                    </div>
-                    <div class="bg-white/10 rounded-xl p-2 border border-white/10">
-                        <div class="text-xs font-black text-white">43</div>
-                        <div class="text-[9px] text-emerald-100 font-bold">قوانين محدثة</div>
-                    </div>
-                    <div class="bg-white/10 rounded-xl p-2 border border-white/10">
-                        <div class="text-xs font-black text-white">6,004</div>
-                        <div class="text-[9px] text-emerald-100 font-bold">نصوص رسمية</div>
-                    </div>
-                    <div class="bg-white/10 rounded-xl p-2 border border-white/10">
-                        <div class="text-xs font-black text-amber-300">89</div>
-                        <div class="text-[9px] text-emerald-100 font-bold">عليا ومجلس دولة</div>
+                    <!-- 4 Live KPI Metrics Grid -->
+                    <div class="grid grid-cols-4 gap-2 text-center mt-3">
+                        <div class="bg-white/10 rounded-xl p-2 border border-white/10">
+                            <div id="lib-kpi-laws" class="text-xs font-black text-white">59</div>
+                            <div class="text-[9px] text-emerald-100 font-bold">قانوناً مدوناً</div>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-2 border border-white/10">
+                            <div id="lib-kpi-articles" class="text-xs font-black text-amber-300">6,012</div>
+                            <div class="text-[9px] text-emerald-100 font-bold">مادة رسمية</div>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-2 border border-white/10">
+                            <div id="lib-kpi-juris" class="text-xs font-black text-amber-300">89</div>
+                            <div class="text-[9px] text-emerald-100 font-bold">اجتهاد قضائي</div>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-2 border border-white/10">
+                            <div id="lib-kpi-domains" class="text-xs font-black text-white">9</div>
+                            <div class="text-[9px] text-emerald-100 font-bold">مجالات معتمدة</div>
+                        </div>
                     </div>
                 </div>
-            </div>
             </header>
 
-            <!-- Search & Filters Container -->
+            <!-- Search & Segment Controls Container -->
             <div class="px-5 mt-4 space-y-3.5">
+                <!-- Search Box with Debounce -->
                 <div class="bg-slate-100 rounded-2xl p-2.5 border border-slate-200 flex items-center space-x-reverse space-x-2 shadow-xs">
-                    <svg class="w-4 h-4 text-slate-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input id="sources-search-input" oninput="filterSourcesList()" type="text" placeholder="إبحث برقم القانون، الجريدة الرسمية أو الموضوع..." class="flex-1 bg-transparent text-xs outline-none text-slate-900 placeholder-slate-400">
+                    <svg class="w-4 h-4 text-slate-400 mr-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <input id="library-main-search" oninput="onLibrarySearchInput(this.value)" type="text" placeholder="إبحث برقم المادة، اسم القانون أو الكلمة (مثال: عطلة الأمومة، Art 204)..." class="flex-1 bg-transparent text-xs outline-none text-slate-900 placeholder-slate-400">
+                    <button id="library-search-clear-btn" onclick="clearLibrarySearch()" class="hidden text-slate-400 hover:text-slate-600 p-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
 
-                <!-- Comprehensive Domains Grid in Sources (Requested by User) -->
-                <div class="pt-1">
-                    <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-xs font-bold text-slate-900 flex items-center space-x-reverse space-x-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                            <span>تصفح حسب المجالات القانونية (اختر مجالاً)</span>
-                        </h2>
-                        <span class="text-[10px] text-slate-400 font-medium">6 مجالات معتمدة</span>
+                <!-- 3 Top Tabs: المجالات والقوانين (59) | بحث المواد | اجتهادات المحكمة العليا (89) -->
+                <div class="flex space-x-reverse space-x-2 overflow-x-auto no-scrollbar pb-1 text-[11px] font-semibold border-b border-slate-200/80">
+                    <button id="lib-tab-btn-domains" onclick="switchLibraryTab('domains')" class="lib-tab-btn px-3 py-1.5 rounded-xl bg-forest-800 text-white shrink-0 shadow-xs flex items-center space-x-reverse space-x-1">
+                        <span>📚</span>
+                        <span>المجالات والقوانين (59)</span>
+                    </button>
+                    <button id="lib-tab-btn-search" onclick="switchLibraryTab('search')" class="lib-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 flex items-center space-x-reverse space-x-1">
+                        <span>🔍</span>
+                        <span>البحث في 6,012 مادة</span>
+                        <span id="lib-search-badge" class="hidden text-[9px] font-bold bg-amber-500 text-white px-1.5 py-0.2 rounded-full">0</span>
+                    </button>
+                    <button id="lib-tab-btn-juris" onclick="switchLibraryTab('juris')" class="lib-tab-btn px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 flex items-center space-x-reverse space-x-1">
+                        <span>⚖️</span>
+                        <span>اجتهادات المحكمة العليا (89)</span>
+                    </button>
+                </div>
+
+                <!-- TAB 1: المجالات والقوانين 59 (DOMAINS VIEW) -->
+                <div id="lib-section-domains" class="space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-xs font-bold text-slate-900 flex items-center space-x-reverse space-x-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                <span>المجالات القانونية (اختر مجالاً لتصفح قوانينه)</span>
+                            </h2>
+                            <span class="text-[10px] text-slate-400 font-medium">9 مجالات معتمدة</span>
+                        </div>
+                        <div id="lib-domains-grid" class="grid grid-cols-3 gap-2">
+                            <!-- Populated dynamically via JS: renderLibraryDomains() -->
+                        </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <!-- Foncier -->
-                        <div onclick="openCategoryPage('foncier', 'sources')" class="bg-amber-50/90 border border-amber-200/90 hover:border-amber-400 rounded-2xl p-2.5 flex flex-col items-center text-center cursor-pointer transition-all active:scale-95 shadow-xs">
-                            <span class="text-xl mb-1">🏛️</span>
-                            <span class="text-[11px] font-bold text-slate-900 leading-tight">العقار والتعمير</span>
-                            <span class="text-[9px] text-amber-800 font-semibold mt-0.5">8 نصوص وقرارات</span>
+
+                    <!-- Laws feed under selected domain or all laws -->
+                    <div class="pt-2 border-t border-slate-200/80">
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 id="lib-laws-list-header" class="text-xs font-bold text-slate-900">أهم القوانين والمدونات المدونة</h2>
+                            <button id="lib-laws-reset-filter" onclick="loadLibraryLaws(null)" class="hidden text-[10px] text-forest-800 font-bold hover:underline">عرض كل القوانين (59)</button>
                         </div>
-                        <!-- Commerce -->
-                        <div onclick="openCategoryPage('commerce', 'sources')" class="bg-blue-50/90 border border-blue-200/90 hover:border-blue-400 rounded-2xl p-2.5 flex flex-col items-center text-center cursor-pointer transition-all active:scale-95 shadow-xs">
-                            <span class="text-xl mb-1">💼</span>
-                            <span class="text-[11px] font-bold text-slate-900 leading-tight">التجارة والاستثمار</span>
-                            <span class="text-[9px] text-blue-800 font-semibold mt-0.5">11 نصاً وقراراً</span>
-                        </div>
-                        <!-- Penal -->
-                        <div onclick="openCategoryPage('penal', 'sources')" class="bg-rose-50/90 border border-rose-200/90 hover:border-rose-400 rounded-2xl p-2.5 flex flex-col items-center text-center cursor-pointer transition-all active:scale-95 shadow-xs">
-                            <span class="text-xl mb-1">🛡️</span>
-                            <span class="text-[11px] font-bold text-slate-900 leading-tight">العقوبات والمرور</span>
-                            <span class="text-[9px] text-rose-800 font-semibold mt-0.5">5 نصوص وقوانين</span>
-                        </div>
-                        <!-- Civil -->
-                        <div onclick="openCategoryPage('civil', 'sources')" class="bg-emerald-50/90 border border-emerald-200/90 hover:border-emerald-400 rounded-2xl p-2.5 flex flex-col items-center text-center cursor-pointer transition-all active:scale-95 shadow-xs">
-                            <span class="text-xl mb-1">⚖️</span>
-                            <span class="text-[11px] font-bold text-slate-900 leading-tight">المدني والتأمينات</span>
-                            <span class="text-[9px] text-emerald-800 font-semibold mt-0.5">4 نصوص سارية</span>
-                        </div>
-                        <!-- Travail -->
-                        <div onclick="openCategoryPage('travail', 'sources')" class="bg-purple-50/90 border border-purple-200/90 hover:border-purple-400 rounded-2xl p-2.5 flex flex-col items-center text-center cursor-pointer transition-all active:scale-95 shadow-xs">
-                            <span class="text-xl mb-1">👥</span>
-                            <span class="text-[11px] font-bold text-slate-900 leading-tight">العمل والوظيفة</span>
-                            <span class="text-[9px] text-purple-800 font-semibold mt-0.5">5 نصوص رسمية</span>
-                        </div>
-                        <!-- Famille -->
-                        <div onclick="openCategoryPage('famille', 'sources')" class="bg-indigo-50/90 border border-indigo-200/90 hover:border-indigo-400 rounded-2xl p-2.5 flex flex-col items-center text-center cursor-pointer transition-all active:scale-95 shadow-xs">
-                            <span class="text-xl mb-1">👨‍👩‍👧‍👦</span>
-                            <span class="text-[11px] font-bold text-slate-900 leading-tight">الأسرة والميراث</span>
-                            <span class="text-[9px] text-indigo-800 font-semibold mt-0.5">3 نصوص وأحكام</span>
+                        <div id="lib-laws-container" class="space-y-3 pt-1">
+                            <!-- Populated dynamically via JS -->
                         </div>
                     </div>
                 </div>
 
-                <!-- Feed Header & Filter Pills -->
-                <div class="pt-2 border-t border-slate-200/80">
-                    <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-xs font-bold text-slate-900">أحدث النصوص مع رابط التحميل المباشر</h2>
-                        <span class="text-[10px] text-rose-600 font-bold bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full">PDF رسمي</span>
+                <!-- TAB 2: نتائج البحث في المواد 6,012 (SEARCH RESULTS VIEW) -->
+                <div id="lib-section-search" class="space-y-3 hidden">
+                    <div class="flex items-center justify-between">
+                        <div class="text-xs font-bold text-slate-900 flex items-center space-x-reverse space-x-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            <span id="lib-search-header-title">نتائج البحث في نصوص المواد</span>
+                        </div>
+                        <span id="lib-search-total-count" class="text-[10px] text-slate-500 font-medium">0 مادة</span>
                     </div>
-
-                    <div class="flex space-x-reverse space-x-2 overflow-x-auto no-scrollbar pb-1 text-[11px] font-semibold">
-                        <button onclick="setSourceFilter('all')" class="source-filter-btn px-3 py-1 rounded-full bg-forest-800 text-white shrink-0 shadow-xs">الكل</button>
-                        <button onclick="setSourceFilter('active')" class="source-filter-btn px-3 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">ساري المفعول</button>
-                        <button onclick="setSourceFilter('foncier')" class="source-filter-btn px-3 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">العقار</button>
-                        <button onclick="setSourceFilter('commerce')" class="source-filter-btn px-3 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">التجارة</button>
-                        <button onclick="setSourceFilter('penal')" class="source-filter-btn px-3 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">الجزائي</button>
-                        <button onclick="setSourceFilter('jurisprudence')" class="source-filter-btn px-3 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0">المحكمة العليا ومجلس الدولة</button>
+                    <div id="lib-search-results-container" class="space-y-3">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <div id="lib-search-load-more" class="hidden text-center pt-2">
+                        <button onclick="loadMoreSearchResults()" class="w-full py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold transition-all active:scale-98">
+                            تحميل المزيد من المواد...
+                        </button>
                     </div>
                 </div>
 
-                <!-- Laws List -->
-                <div id="sources-list-container" class="space-y-3 pt-1">
-                    <!-- Populated dynamically via JS with read button & PDF download button -->
+                <!-- TAB 3: اجتهادات المحكمة العليا (JURISPRUDENCE VIEW) -->
+                <div id="lib-section-juris" class="space-y-3 hidden">
+                    <div class="flex items-center justify-between">
+                        <div class="text-xs font-bold text-slate-900 flex items-center space-x-reverse space-x-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+                            <span>قرارات واجتهادات المحكمة العليا ومجلس الدولة</span>
+                        </div>
+                        <span id="lib-juris-total-count" class="text-[10px] text-slate-500 font-medium">89 قراراً مبدئياً</span>
+                    </div>
+                    <div id="lib-juris-container" class="space-y-3">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <div id="lib-juris-load-more" class="hidden text-center pt-2">
+                        <button onclick="loadMoreJurisprudence()" class="w-full py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold transition-all active:scale-98">
+                            تحميل المزيد من القرارات...
+                        </button>
+                    </div>
                 </div>
+
             </div>
         </main>
 
@@ -1596,10 +1615,10 @@
                 <span class="text-[10px] font-bold mt-0.5">الرئيسية</span>
             </button>
 
-            <!-- Tab 2: المصادر -->
+            <!-- Tab 2: المكتبة القانونية -->
             <button id="nav-btn-sources" onclick="switchTab('sources')" class="flex flex-col items-center justify-center py-1 text-slate-400 hover:text-slate-600 w-16 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                <span class="text-[10px] font-medium mt-0.5">المصادر</span>
+                <span class="text-[10px] font-bold mt-0.5">المكتبة</span>
             </button>
 
             <!-- Tab 3: Central Floating Action Button (محادثة جديدة) -->
@@ -2219,31 +2238,11 @@
         };
 
         function openCategoryPage(categoryKey, fromView = 'home') {
-            currentCategoryKey = categoryKey;
-            currentCategorySubFilter = 'all';
-            previousView = fromView || 'home';
-
-            const meta = CATEGORIES_METADATA[categoryKey] || CATEGORIES_METADATA['foncier'];
-            const header = document.getElementById('cat-header');
-            if (header) {
-                header.className = `relative overflow-hidden text-white px-5 pt-4 pb-6 rounded-b-3xl shadow-lg transition-all duration-300 ${meta.headerClass}`;
-            }
-            document.getElementById('cat-title').innerText = meta.title;
-            document.getElementById('cat-desc').innerText = meta.desc;
-            document.getElementById('cat-icon-box').innerText = meta.icon;
-            document.getElementById('cat-badge-top').innerText = meta.badgeText;
-            document.getElementById('cat-count-badge').innerText = meta.countText;
-            document.getElementById('cat-search-input').value = '';
-
-            const backLabel = document.getElementById('cat-back-label');
-            if (backLabel) {
-                backLabel.innerText = previousView === 'sources' ? 'المصادر' : 'الرئيسية';
-            }
-
-            const catLaws = LAWS_DATABASE.filter(l => l.domain === categoryKey);
-            document.getElementById('count-sub-all').innerText = catLaws.length;
-            document.getElementById('count-sub-law').innerText = catLaws.filter(l => l.type === 'law').length;
-            document.getElementById('count-sub-decree').innerText = catLaws.filter(l => l.type === 'decree').length;
+            switchTab('sources');
+            switchLibraryTab('domains');
+            selectLibraryDomain(categoryKey);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
             document.getElementById('count-sub-juris').innerText = catLaws.filter(l => l.type === 'jurisprudence').length;
 
             setCategorySubFilter('all', false);
@@ -2424,63 +2423,739 @@
             window.scrollTo(0, 0);
         }
 
-        // POPULATE LAWS LIST IN SOURCES TAB
-        function renderLawsList(list) {
-            const container = document.getElementById('sources-list-container');
+        // ========================================================
+        // DIGITAL LAW LIBRARY ENGINE (59 LAWS, 6,012 ARTICLES, 89 JURISPRUDENCE)
+        // Built with Performance First: In-Memory Cache, Debounced Search, Lazy Loading
+        // ========================================================
+
+        const LibraryCache = {
+            overview: null,
+            domainLaws: new Map(),
+            lawArticles: new Map(),
+            jurisprudence: null
+        };
+
+        const LibraryState = {
+            activeTab: 'domains',
+            activeDomain: null,
+            searchQuery: '',
+            searchOffset: 0,
+            searchLimit: 20,
+            searchTotal: 0,
+            searchHasMore: false,
+            searchLoading: false,
+            searchResults: [],
+            jurisOffset: 0,
+            jurisLimit: 20,
+            jurisTotal: 0,
+            jurisHasMore: false,
+            jurisLoading: false,
+            jurisResults: [],
+            reader: {
+                lawTitle: '',
+                offset: 0,
+                limit: 25,
+                total: 0,
+                hasMore: false,
+                loading: false,
+                articles: [],
+                filterQuery: '',
+                scrollListenerAttached: false
+            }
+        };
+
+        let librarySearchDebounce = null;
+
+        // 1. REFRESH & LOAD OVERVIEW
+        async function refreshLibraryOverview(force = false) {
+            if (!force && LibraryCache.overview) {
+                renderLibraryOverview(LibraryCache.overview);
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/library/overview');
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    LibraryCache.overview = data;
+                    renderLibraryOverview(data);
+                }
+            } catch (err) {
+                console.error('Error fetching library overview:', err);
+            }
+        }
+
+        function renderLibraryOverview(data) {
+            const kpiLaws = document.getElementById('lib-kpi-laws');
+            const kpiArts = document.getElementById('lib-kpi-articles');
+            const kpiJuris = document.getElementById('lib-kpi-juris');
+            const kpiDomains = document.getElementById('lib-kpi-domains');
+
+            if (kpiLaws) kpiLaws.innerText = (data.total_laws || 59).toLocaleString();
+            if (kpiArts) kpiArts.innerText = (data.total_articles || 6012).toLocaleString();
+            if (kpiJuris) kpiJuris.innerText = (data.total_jurisprudence || 89).toLocaleString();
+            if (kpiDomains) kpiDomains.innerText = (data.categories ? data.categories.length : 9).toString();
+
+            renderLibraryDomains(data.categories || []);
+
+            if (!LibraryState.activeDomain) {
+                loadLibraryLaws(null);
+            }
+        }
+
+        function renderLibraryDomains(categories) {
+            const container = document.getElementById('lib-domains-grid');
             if (!container) return;
 
-            if (list.length === 0) {
+            const colorBgMap = {
+                'slate': 'bg-slate-50 border-slate-200 text-slate-800',
+                'emerald': 'bg-emerald-50/80 border-emerald-200 text-emerald-900',
+                'rose': 'bg-rose-50/80 border-rose-200 text-rose-900',
+                'blue': 'bg-blue-50/80 border-blue-200 text-blue-900',
+                'indigo': 'bg-indigo-50/80 border-indigo-200 text-indigo-900',
+                'cyan': 'bg-cyan-50/80 border-cyan-200 text-cyan-900',
+                'violet': 'bg-purple-50/80 border-purple-200 text-purple-900',
+                'amber': 'bg-amber-50/80 border-amber-200 text-amber-900',
+                'teal': 'bg-teal-50/80 border-teal-200 text-teal-900'
+            };
+
+            container.innerHTML = categories.map(cat => {
+                const isSelected = LibraryState.activeDomain === cat.key;
+                const cls = colorBgMap[cat.color] || 'bg-slate-50 border-slate-200 text-slate-800';
+                const activeRing = isSelected ? 'ring-2 ring-forest-800 border-forest-800' : '';
+
+                return `
+                    <div onclick="selectLibraryDomain('${cat.key}')" class="${cls} ${activeRing} rounded-2xl p-2.5 flex flex-col items-center text-center cursor-pointer transition-all active:scale-95 shadow-xs border hover:shadow-sm">
+                        <span class="text-xl mb-1">${cat.icon}</span>
+                        <span class="text-[11px] font-bold leading-tight line-clamp-1">${cat.title_ar}</span>
+                        <span class="text-[9px] font-semibold opacity-80 mt-1">${cat.articles_count.toLocaleString()} مادة • ${cat.laws_count} قوانين</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 2. DOMAIN SELECTION & LAWS LOADING
+        function selectLibraryDomain(domainKey) {
+            if (LibraryState.activeDomain === domainKey) {
+                LibraryState.activeDomain = null;
+            } else {
+                LibraryState.activeDomain = domainKey;
+            }
+            if (LibraryCache.overview) {
+                renderLibraryDomains(LibraryCache.overview.categories || []);
+            }
+            loadLibraryLaws(LibraryState.activeDomain);
+        }
+
+        async function loadLibraryLaws(domainKey = null) {
+            LibraryState.activeDomain = domainKey;
+            const container = document.getElementById('lib-laws-container');
+            const header = document.getElementById('lib-laws-list-header');
+            const resetBtn = document.getElementById('lib-laws-reset-filter');
+
+            if (resetBtn) {
+                if (domainKey) resetBtn.classList.remove('hidden');
+                else resetBtn.classList.add('hidden');
+            }
+
+            if (header) {
+                if (domainKey) {
+                    const cat = LibraryCache.overview?.categories?.find(c => c.key === domainKey);
+                    header.innerText = cat ? `قوانين ${cat.title_ar} (${cat.laws_count} قانون)` : 'القوانين المختارة';
+                } else {
+                    header.innerText = 'أهم القوانين والمدونات المدونة (59 قانوناً)';
+                }
+            }
+
+            if (!container) return;
+
+            const cacheKey = domainKey || '__all__';
+            if (LibraryCache.domainLaws.has(cacheKey)) {
+                renderLibraryLaws(LibraryCache.domainLaws.get(cacheKey));
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="py-6 text-center text-slate-400">
+                    <div class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-forest-800 border-t-transparent mb-2"></div>
+                    <div class="text-[11px] font-medium">جاري تحميل القوانين...</div>
+                </div>
+            `;
+
+            try {
+                const url = domainKey ? `/api/library/laws?domain=${encodeURIComponent(domainKey)}` : '/api/library/laws';
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    LibraryCache.domainLaws.set(cacheKey, data.laws);
+                    renderLibraryLaws(data.laws);
+                }
+            } catch (err) {
                 container.innerHTML = `
-                    <div class="bg-white rounded-2xl p-8 border border-slate-200 text-center text-slate-400">
-                        <div class="text-3xl mb-2">🔍</div>
-                        <div class="text-xs font-bold text-slate-700">لم يتم العثور على مصادر مطابقة</div>
-                        <div class="text-[10px] text-slate-400 mt-1">جرّب كتابة رقم القانون أو السنة.</div>
+                    <div class="p-4 text-center text-rose-600 text-xs font-bold">
+                        تعذر تحميل القوانين. تأكد من اتصال الإنترنت.
+                    </div>
+                `;
+            }
+        }
+
+        function renderLibraryLaws(laws) {
+            const container = document.getElementById('lib-laws-container');
+            if (!container) return;
+
+            if (laws.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 text-center text-slate-400">
+                        <div class="text-2xl mb-1">📂</div>
+                        <div class="text-xs font-bold text-slate-700">لا توجد قوانين مسجلة في هذا القسم</div>
                     </div>
                 `;
                 return;
             }
 
-            container.innerHTML = list.map(law => generateLawCardHtml(law)).join('');
+            container.innerHTML = laws.map(law => {
+                const safeTitle = escapeHtml(law.title);
+                const safeDomain = escapeHtml(law.domain_title_ar || law.domain_raw);
+                return `
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-xs hover:border-emerald-500 transition-all flex flex-col space-y-2">
+                        <div class="flex items-start justify-between space-x-reverse space-x-2">
+                            <div class="flex-1">
+                                <span class="text-[9px] font-bold text-forest-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                                    ${safeDomain}
+                                </span>
+                                <h3 class="text-xs font-bold text-slate-900 mt-1 leading-snug">${safeTitle}</h3>
+                            </div>
+                            <span class="text-[10px] font-black text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-lg shrink-0 border border-emerald-100">
+                                ${law.articles_count} مادة
+                            </span>
+                        </div>
+                        <div class="flex items-center space-x-reverse space-x-2 pt-2 border-t border-slate-100">
+                            <button onclick="openRealLawArticlesModal('${escapeQuotes(law.title)}', ${law.articles_count})" class="flex-1 min-h-[40px] py-2 px-3 rounded-xl bg-forest-800 hover:bg-forest-900 text-white text-[11px] font-bold flex items-center justify-center space-x-reverse space-x-1.5 shadow-xs active:scale-95 transition-all">
+                                <span>📖</span>
+                                <span>تصفح المواد الرسمية (${law.articles_count})</span>
+                            </button>
+                            <button onclick="consultLawInChat('${escapeQuotes(law.title)}')" class="min-h-[40px] px-3 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 text-[11px] font-bold flex items-center justify-center space-x-reverse space-x-1 border border-slate-200 active:scale-95 transition-all" title="استشارة المستشار حول هذا القانون">
+                                <span>⚖️ استشارة</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        let currentSourceFilter = 'all';
+        // 3. TAB SWITCHING
+        function switchLibraryTab(tab) {
+            LibraryState.activeTab = tab;
 
-        function filterSourcesList() {
-            const q = (document.getElementById('sources-search-input')?.value || '').trim().toLowerCase();
-            let filtered = LAWS_DATABASE;
+            ['domains', 'search', 'juris'].forEach(t => {
+                const btn = document.getElementById(`lib-tab-btn-${t}`);
+                const section = document.getElementById(`lib-section-${t}`);
+                if (!btn || !section) return;
 
-            if (currentSourceFilter !== 'all') {
-                if (currentSourceFilter === 'active') {
-                    filtered = filtered.filter(l => l.status === 'ساري المفعول');
-                } else if (currentSourceFilter === 'jurisprudence') {
-                    filtered = filtered.filter(l => l.type === 'jurisprudence');
+                if (t === tab) {
+                    btn.classList.add('bg-forest-800', 'text-white');
+                    btn.classList.remove('bg-slate-100', 'text-slate-600');
+                    section.classList.remove('hidden');
                 } else {
-                    filtered = filtered.filter(l => l.domain === currentSourceFilter);
+                    btn.classList.remove('bg-forest-800', 'text-white');
+                    btn.classList.add('bg-slate-100', 'text-slate-600');
+                    section.classList.add('hidden');
+                }
+            });
+
+            if (tab === 'juris' && LibraryState.jurisResults.length === 0) {
+                loadJurisprudenceList();
+            }
+        }
+
+        // 4. DEBOUNCED SEARCH ACROSS 6,012 ARTICLES
+        function onLibrarySearchInput(query) {
+            const clearBtn = document.getElementById('library-search-clear-btn');
+            if (clearBtn) {
+                if (query.trim().length > 0) clearBtn.classList.remove('hidden');
+                else clearBtn.classList.add('hidden');
+            }
+
+            clearTimeout(librarySearchDebounce);
+            librarySearchDebounce = setTimeout(() => {
+                performLibrarySearch(query.trim());
+            }, 300);
+        }
+
+        function clearLibrarySearch() {
+            const input = document.getElementById('library-main-search');
+            if (input) input.value = '';
+            const clearBtn = document.getElementById('library-search-clear-btn');
+            if (clearBtn) clearBtn.classList.add('hidden');
+            switchLibraryTab('domains');
+        }
+
+        async function performLibrarySearch(query) {
+            if (!query || query.length < 2) {
+                switchLibraryTab('domains');
+                return;
+            }
+
+            LibraryState.searchQuery = query;
+            LibraryState.searchOffset = 0;
+            LibraryState.searchResults = [];
+
+            switchLibraryTab('search');
+
+            const container = document.getElementById('lib-search-results-container');
+            const totalCount = document.getElementById('lib-search-total-count');
+            const loadMore = document.getElementById('lib-search-load-more');
+            const badge = document.getElementById('lib-search-badge');
+
+            if (container) {
+                container.innerHTML = `
+                    <div class="py-8 text-center text-slate-400">
+                        <div class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-amber-500 border-t-transparent mb-2"></div>
+                        <div class="text-xs font-semibold">جاري البحث في 6,012 مادة قانونية...</div>
+                    </div>
+                `;
+            }
+
+            try {
+                const res = await fetch(`/api/library/articles?search=${encodeURIComponent(query)}&limit=${LibraryState.searchLimit}&offset=0`);
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    LibraryState.searchTotal = data.total;
+                    LibraryState.searchHasMore = data.has_more;
+                    LibraryState.searchResults = data.articles;
+
+                    if (totalCount) totalCount.innerText = `${data.total.toLocaleString()} مادة مطابقة`;
+                    if (badge) {
+                        badge.innerText = data.total;
+                        badge.classList.remove('hidden');
+                    }
+                    if (loadMore) {
+                        if (data.has_more) loadMore.classList.remove('hidden');
+                        else loadMore.classList.add('hidden');
+                    }
+
+                    renderSearchResults(data.articles, query, false);
+                }
+            } catch (err) {
+                if (container) {
+                    container.innerHTML = `
+                        <div class="p-4 text-center text-rose-600 text-xs font-bold">
+                            حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى.
+                        </div>
+                    `;
                 }
             }
-
-            if (q) {
-                filtered = filtered.filter(l => 
-                    l.title.toLowerCase().includes(q) || 
-                    l.code.toLowerCase().includes(q) || 
-                    l.desc.toLowerCase().includes(q) ||
-                    (l.source && l.source.toLowerCase().includes(q))
-                );
-            }
-            renderLawsList(filtered);
         }
 
-        function setSourceFilter(filterType) {
-            currentSourceFilter = filterType;
-            document.querySelectorAll('.source-filter-btn').forEach(b => {
-                b.classList.remove('bg-forest-800', 'text-white');
-                b.classList.add('bg-slate-100', 'text-slate-600');
-            });
-            if (window.event && window.event.target) {
-                window.event.target.classList.add('bg-forest-800', 'text-white');
-                window.event.target.classList.remove('bg-slate-100', 'text-slate-600');
+        async function loadMoreSearchResults() {
+            if (LibraryState.searchLoading || !LibraryState.searchHasMore) return;
+            LibraryState.searchLoading = true;
+            LibraryState.searchOffset += LibraryState.searchLimit;
+
+            const loadMore = document.getElementById('lib-search-load-more');
+            if (loadMore) {
+                loadMore.innerHTML = `
+                    <div class="py-2 text-center text-slate-400 text-xs font-medium">جاري تحميل المزيد...</div>
+                `;
             }
-            filterSourcesList();
+
+            try {
+                const res = await fetch(`/api/library/articles?search=${encodeURIComponent(LibraryState.searchQuery)}&limit=${LibraryState.searchLimit}&offset=${LibraryState.searchOffset}`);
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    LibraryState.searchHasMore = data.has_more;
+                    LibraryState.searchResults.push(...data.articles);
+                    renderSearchResults(data.articles, LibraryState.searchQuery, true);
+
+                    if (loadMore) {
+                        if (data.has_more) {
+                            loadMore.classList.remove('hidden');
+                            loadMore.innerHTML = `
+                                <button onclick="loadMoreSearchResults()" class="w-full py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold transition-all active:scale-98">
+                                    تحميل المزيد من المواد (${LibraryState.searchTotal - LibraryState.searchResults.length} متبقية)...
+                                </button>
+                            `;
+                        } else {
+                            loadMore.classList.add('hidden');
+                        }
+                    }
+                }
+            } finally {
+                LibraryState.searchLoading = false;
+            }
+        }
+
+        function renderSearchResults(articles, query, append = false) {
+            const container = document.getElementById('lib-search-results-container');
+            if (!container) return;
+
+            if (!append && articles.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-8 border border-slate-200 text-center text-slate-400">
+                        <div class="text-3xl mb-2">🔍</div>
+                        <div class="text-xs font-bold text-slate-700">لم يتم العثور على أية مادة مطابقة لـ "${escapeHtml(query)}"</div>
+                        <div class="text-[10px] text-slate-400 mt-1">جرّب البحث بكلمة مفتاحية عامة (مثال: نفقة، عقد، شركة، مخالفة).</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = articles.map(art => {
+                const safeNum = escapeHtml(art.article_num);
+                const safeTitle = escapeHtml(art.title);
+                const safeContent = highlightText(escapeHtml(art.content), query);
+
+                return `
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-xs hover:border-amber-400 transition-all space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-black text-amber-800 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">
+                                ${safeNum}
+                            </span>
+                            <span class="text-[9px] font-medium text-slate-400 truncate max-w-[200px]">
+                                ${safeTitle}
+                            </span>
+                        </div>
+                        <div class="text-xs text-slate-800 leading-relaxed max-h-36 overflow-y-auto no-scrollbar font-normal p-2 bg-slate-50 rounded-xl border border-slate-100">
+                            ${safeContent}
+                        </div>
+                        <div class="flex items-center justify-between pt-1 text-[10px]">
+                            <button onclick="safeCopyToClipboard('${escapeQuotes(art.content)}', 'تم نسخ نص المادة بنجاح!')" class="text-slate-500 hover:text-slate-800 font-bold flex items-center space-x-reverse space-x-1">
+                                <span>📋 نسخ النص</span>
+                            </button>
+                            <button onclick="consultArticleInChat('${escapeQuotes(art.title)}', '${escapeQuotes(art.article_num)}')" class="text-forest-800 font-bold hover:underline">
+                                ⚖️ استفسر عن هذه المادة
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (append) {
+                container.insertAdjacentHTML('beforeend', html);
+            } else {
+                container.innerHTML = html;
+            }
+        }
+
+        // 5. JURISPRUDENCE (89 COUR SUPRÊME DECISIONS)
+        async function loadJurisprudenceList() {
+            const container = document.getElementById('lib-juris-container');
+            const totalCount = document.getElementById('lib-juris-total-count');
+            const loadMore = document.getElementById('lib-juris-load-more');
+
+            if (container) {
+                container.innerHTML = `
+                    <div class="py-8 text-center text-slate-400">
+                        <div class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-rose-600 border-t-transparent mb-2"></div>
+                        <div class="text-xs font-semibold">جاري تحميل اجتهادات المحكمة العليا ومجلس الدولة...</div>
+                    </div>
+                `;
+            }
+
+            try {
+                const res = await fetch(`/api/library/jurisprudence?limit=${LibraryState.jurisLimit}&offset=0`);
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    LibraryState.jurisTotal = data.total;
+                    LibraryState.jurisHasMore = data.has_more;
+                    LibraryState.jurisResults = data.items;
+
+                    if (totalCount) totalCount.innerText = `${data.total.toLocaleString()} قراراً مبدئياً`;
+                    if (loadMore) {
+                        if (data.has_more) loadMore.classList.remove('hidden');
+                        else loadMore.classList.add('hidden');
+                    }
+
+                    renderJurisprudenceList(data.items, false);
+                }
+            } catch (err) {
+                if (container) {
+                    container.innerHTML = `
+                        <div class="p-4 text-center text-rose-600 text-xs font-bold">
+                            تعذر تحميل قرارات المحكمة العليا.
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        async function loadMoreJurisprudence() {
+            if (LibraryState.jurisLoading || !LibraryState.jurisHasMore) return;
+            LibraryState.jurisLoading = true;
+            LibraryState.jurisOffset += LibraryState.jurisLimit;
+
+            const loadMore = document.getElementById('lib-juris-load-more');
+            if (loadMore) {
+                loadMore.innerHTML = `
+                    <div class="py-2 text-center text-slate-400 text-xs font-medium">جاري تحميل المزيد...</div>
+                `;
+            }
+
+            try {
+                const res = await fetch(`/api/library/jurisprudence?limit=${LibraryState.jurisLimit}&offset=${LibraryState.jurisOffset}`);
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    LibraryState.jurisHasMore = data.has_more;
+                    LibraryState.jurisResults.push(...data.items);
+                    renderJurisprudenceList(data.items, true);
+
+                    if (loadMore) {
+                        if (data.has_more) {
+                            loadMore.classList.remove('hidden');
+                            loadMore.innerHTML = `
+                                <button onclick="loadMoreJurisprudence()" class="w-full py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold transition-all active:scale-98">
+                                    تحميل المزيد من القرارات القضائية...
+                                </button>
+                            `;
+                        } else {
+                            loadMore.classList.add('hidden');
+                        }
+                    }
+                }
+            } finally {
+                LibraryState.jurisLoading = false;
+            }
+        }
+
+        function renderJurisprudenceList(items, append = false) {
+            const container = document.getElementById('lib-juris-container');
+            if (!container) return;
+
+            const html = items.map(item => {
+                const safeNum = escapeHtml(item.arret_num || 'قرار غير مرقم');
+                const safeDate = escapeHtml(item.arret_date || '');
+                const safeTheme = escapeHtml(item.theme || 'اجتهاد قضائي');
+                const safePrinciple = escapeHtml(item.principle || '');
+                const safeRefs = escapeHtml(item.legal_refs || '');
+
+                return `
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs hover:border-rose-400 transition-all space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-black text-rose-800 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200">
+                                قرار رقم: ${safeNum}
+                            </span>
+                            ${safeDate ? `<span class="text-[10px] text-slate-400 font-medium">بتاريخ: ${safeDate}</span>` : ''}
+                        </div>
+                        <h3 class="text-xs font-bold text-slate-900 leading-snug">${safeTheme}</h3>
+                        ${safeRefs ? `
+                            <div class="text-[9px] font-semibold text-slate-500 bg-slate-50 p-1.5 rounded-lg">
+                                ⚖️ السند القانوني: ${safeRefs}
+                            </div>
+                        ` : ''}
+                        <div class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl">
+                            <div class="text-[10px] font-bold text-emerald-950 mb-1">المبدأ القضائي المستقر:</div>
+                            <div class="text-xs text-emerald-900 leading-relaxed font-medium">${safePrinciple}</div>
+                        </div>
+                        <div class="flex items-center justify-between pt-1">
+                            <button onclick="openFullJurisprudenceModal('${escapeQuotes(safeNum)}', '${escapeQuotes(safeTheme)}', '${escapeQuotes(item.full_content || item.principle)}')" class="text-xs font-bold text-forest-800 hover:underline">
+                                📖 قراءة التعليل الكامل والحيثيات
+                            </button>
+                            <button onclick="safeCopyToClipboard('${escapeQuotes(item.principle)}', 'تم نسخ المبدأ القضائي!')" class="p-1 text-slate-400 hover:text-slate-700">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (append) {
+                container.insertAdjacentHTML('beforeend', html);
+            } else {
+                container.innerHTML = html;
+            }
+        }
+
+        // 6. REAL LAW ARTICLES MODAL (LAZY-LOADING & INFINITE SCROLL)
+        async function openRealLawArticlesModal(lawTitle, totalCount = 0) {
+            const modal = document.getElementById('modal-document-reader');
+            const readerTitle = document.getElementById('reader-title');
+            const readerBody = document.getElementById('reader-body');
+            const dlLink = document.getElementById('reader-download-link');
+
+            if (!modal || !readerBody) return;
+
+            LibraryState.reader.lawTitle = lawTitle;
+            LibraryState.reader.offset = 0;
+            LibraryState.reader.limit = 25;
+            LibraryState.reader.total = totalCount;
+            LibraryState.reader.articles = [];
+            LibraryState.reader.filterQuery = '';
+            LibraryState.reader.hasMore = true;
+
+            if (readerTitle) {
+                readerTitle.innerText = lawTitle;
+            }
+            if (dlLink) {
+                dlLink.href = 'https://www.joradp.dz';
+            }
+
+            modal.classList.remove('hidden');
+
+            readerBody.innerHTML = `
+                <div class="space-y-3">
+                    <div class="bg-emerald-50 text-emerald-950 p-3 rounded-2xl border border-emerald-200">
+                        <div class="text-xs font-bold">${escapeHtml(lawTitle)}</div>
+                        <div class="text-[10px] text-emerald-700 mt-0.5">النصوص والمواد الرسمية الكاملة المعتمدة فضاء السحب</div>
+                    </div>
+                    <!-- Quick In-Law Search -->
+                    <div class="bg-white border border-slate-200 rounded-xl p-2 flex items-center space-x-reverse space-x-2 sticky top-0 z-10 shadow-xs">
+                        <svg class="w-4 h-4 text-slate-400 mr-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <input id="reader-law-art-search" oninput="onReaderSearchInput(this.value)" type="text" placeholder="ابحث برقم المادة (مثال: مادة 46) أو كلمة داخل هذا القانون..." class="flex-1 bg-transparent text-xs outline-none text-slate-900 placeholder-slate-400">
+                    </div>
+                    <div id="reader-articles-container" class="space-y-3 pt-1">
+                        <div class="py-8 text-center text-slate-400">
+                            <div class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-forest-800 border-t-transparent mb-2"></div>
+                            <div class="text-xs font-medium">جاري تحميل نصوص المواد...</div>
+                        </div>
+                    </div>
+                    <div id="reader-infinite-loader" class="py-4 text-center text-slate-400 text-xs font-medium hidden">
+                        <div class="inline-block animate-spin rounded-full h-4 w-4 border-2 border-forest-800 border-t-transparent mr-1"></div>
+                        جاري تحميل المزيد من المواد...
+                    </div>
+                </div>
+            `;
+
+            if (!LibraryState.reader.scrollListenerAttached) {
+                readerBody.addEventListener('scroll', handleReaderInfiniteScroll);
+                LibraryState.reader.scrollListenerAttached = true;
+            }
+
+            await fetchLawArticlesPage(lawTitle, 0, '');
+        }
+
+        async function fetchLawArticlesPage(lawTitle, offset, search) {
+            if (LibraryState.reader.loading) return;
+            LibraryState.reader.loading = true;
+
+            const loader = document.getElementById('reader-infinite-loader');
+            if (loader && offset > 0) loader.classList.remove('hidden');
+
+            try {
+                const url = `/api/library/articles?law_title=${encodeURIComponent(lawTitle)}&limit=${LibraryState.reader.limit}&offset=${offset}${search ? `&search=${encodeURIComponent(search)}` : ''}`;
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (data.status === 'ok') {
+                    LibraryState.reader.total = data.total;
+                    LibraryState.reader.hasMore = data.has_more;
+                    LibraryState.reader.articles.push(...data.articles);
+
+                    renderReaderArticles(data.articles, offset > 0);
+                }
+            } catch (err) {
+                console.error('Error fetching law articles:', err);
+            } finally {
+                LibraryState.reader.loading = false;
+                if (loader) loader.classList.add('hidden');
+            }
+        }
+
+        function renderReaderArticles(articles, append = false) {
+            const container = document.getElementById('reader-articles-container');
+            if (!container) return;
+
+            if (!append && articles.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-8 border border-slate-200 text-center text-slate-400">
+                        <div class="text-2xl mb-1">🔍</div>
+                        <div class="text-xs font-bold text-slate-700">لم يتم العثور على أية مادة مطابقة للبحث</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = articles.map(art => {
+                const safeNum = escapeHtml(art.article_num);
+                const safeContent = escapeHtml(art.content);
+                return `
+                    <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black text-forest-900 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200">
+                                ${safeNum}
+                            </span>
+                            <button onclick="safeCopyToClipboard('${escapeQuotes(art.content)}', 'تم نسخ نص ${escapeQuotes(art.article_num)} بنجاح!')" class="text-slate-400 hover:text-slate-700 text-xs flex items-center space-x-reverse space-x-1" title="نسخ">
+                                <span>📋 نسخ</span>
+                            </button>
+                        </div>
+                        <div class="text-xs text-slate-800 leading-relaxed font-normal whitespace-pre-line p-2.5 bg-slate-50/70 rounded-xl border border-slate-100">
+                            ${safeContent}
+                        </div>
+                        <div class="flex items-center justify-end pt-1">
+                            <button onclick="consultArticleInChat('${escapeQuotes(art.title)}', '${escapeQuotes(art.article_num)}')" class="text-[11px] font-bold text-forest-800 hover:underline">
+                                ⚖️ اسأل المستشار عن هذه المادة
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (append) {
+                container.insertAdjacentHTML('beforeend', html);
+            } else {
+                container.innerHTML = html;
+            }
+        }
+
+        function handleReaderInfiniteScroll(e) {
+            const el = e.target;
+            if (el.scrollHeight - el.scrollTop - el.clientHeight < 250) {
+                if (LibraryState.reader.hasMore && !LibraryState.reader.loading) {
+                    LibraryState.reader.offset += LibraryState.reader.limit;
+                    fetchLawArticlesPage(LibraryState.reader.lawTitle, LibraryState.reader.offset, LibraryState.reader.filterQuery);
+                }
+            }
+        }
+
+        let readerSearchDebounce = null;
+        function onReaderSearchInput(query) {
+            clearTimeout(readerSearchDebounce);
+            readerSearchDebounce = setTimeout(() => {
+                LibraryState.reader.filterQuery = query.trim();
+                LibraryState.reader.offset = 0;
+                LibraryState.reader.articles = [];
+                const container = document.getElementById('reader-articles-container');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="py-6 text-center text-slate-400">
+                            <div class="inline-block animate-spin rounded-full h-4 w-4 border-2 border-forest-800 border-t-transparent mb-1"></div>
+                            <div class="text-xs font-medium">جاري البحث...</div>
+                        </div>
+                    `;
+                }
+                fetchLawArticlesPage(LibraryState.reader.lawTitle, 0, LibraryState.reader.filterQuery);
+            }, 300);
+        }
+
+        function consultLawInChat(lawTitle) {
+            closeDocumentView();
+            switchTab('chat');
+            sendUserMessage(`أريد استشارة قانونية دقيقة بخصوص نصوص وأحكام: ${lawTitle} في القانون الجزائري والتشريع الساري.`);
+        }
+
+        function consultArticleInChat(lawTitle, articleNum) {
+            closeDocumentView();
+            switchTab('chat');
+            sendUserMessage(`أريد تفسيراً قانونياً دقيقاً وتطبيقاً قضائياً للمادة "${articleNum}" من "${lawTitle}".`);
+        }
+
+        function openFullJurisprudenceModal(arretNum, theme, content) {
+            openDocumentView(`قرار المحكمة العليا ${arretNum}`, theme, content, 'https://www.cour-supreme.dz', 'المحكمة العليا الجزائرية');
+        }
+
+        function escapeQuotes(str) {
+            if (!str) return '';
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+        }
+
+        function highlightText(text, query) {
+            if (!query) return text;
+            const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<mark class="bg-amber-200 text-slate-900 rounded px-0.5">$1</mark>');
+        }
+
+        function renderLawsList(list) {
+            // Keep for backwards compatibility
+            loadLibraryLaws(null);
         }
 
         // LEGAL TEMPLATES & DOSSIERS SYSTEM (27 OFFICIAL TEMPLATES)
@@ -4079,7 +4754,7 @@
         // INITIALIZATION
         window.addEventListener('DOMContentLoaded', () => {
             loadChatConversations();
-            renderLawsList(LAWS_DATABASE);
+            refreshLibraryOverview();
             renderDossiersGrid();
             renderTemplatesList();
             renderCurrentConversation();

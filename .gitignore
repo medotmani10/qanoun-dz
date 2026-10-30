@@ -2,5 +2,7 @@ __pycache__/
 *.pyc
 *.pyo
 .DS_Store
+.env
+legal_agent_memory.db
 legal_agent_memory.db-wal
 legal_agent_memory.db-shm
