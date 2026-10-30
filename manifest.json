@@ -1,0 +1,50 @@
+{
+  "name": "Qanoun DZ - Mou7ami Dhaki",
+  "short_name": "Qanoun DZ",
+  "description": "Assistant juridique et legal IA en Algerie fonde sur le Journal Officiel et la jurisprudence de la Cour Supreme.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0F4325",
+  "dir": "ltr",
+  "lang": "fr-DZ",
+  "categories": ["business", "legal", "productivity"],
+  "icons": [
+    {
+      "src": "/assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Istichara Jadida",
+      "short_name": "Istichara",
+      "description": "Moussa3ada qanouniya fawriya",
+      "url": "/#chat",
+      "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Namadhij w 3oqoud",
+      "short_name": "Namadhij",
+      "description": "Telecharger et modifier contrats et requetes",
+      "url": "/#bookmarks",
+      "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

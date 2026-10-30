@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+legal_agent_memory.db-wal
+legal_agent_memory.db-shm

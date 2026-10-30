@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: qanoun-dz
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: python3 app.py
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: GEMINI_API_KEY
+        sync: false
