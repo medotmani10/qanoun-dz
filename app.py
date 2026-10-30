@@ -718,7 +718,8 @@ class LegalRequestHandler(http.server.BaseHTTPRequestHandler):
                 history = req_json.get('history', [])
                 user_id = req_json.get('user_id', 'default_user')
                 persona = req_json.get('persona', 'citoyen')
-                res = ask_legal_agent(q, lang=lang, history=history, user_id=user_id, persona=persona)
+                current_date = req_json.get('current_date', None)
+                res = ask_legal_agent(q, lang=lang, history=history, user_id=user_id, persona=persona, current_date=current_date)
                 self.send_json_response(200, res)
             except Exception as e:
                 self.send_json_response(500, {'error': str(e)})

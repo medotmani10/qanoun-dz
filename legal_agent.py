@@ -287,13 +287,32 @@ PERSONA_PROFILES = {
     }
 }
 
-def ask_legal_agent(user_query, lang="ar", history=None, user_id="default_user", persona="citoyen"):
+def ask_legal_agent(user_query, lang="ar", history=None, user_id="default_user", persona="citoyen", current_date=None):
     """
     Main agent pipeline - 100% Dynamic AI (Zero canned or automated responses):
+    - Real-time Date & Year Awareness (calculating deadlines and active legislation).
     - User Persona adaptation (citoyen, commercant, salarie, juriste).
     - Natural, intelligent legal consultation powered by Gemini + RAG.
     - Cites official legal source at bottom when legal context applies.
     """
+    import datetime
+
+    # 1. Real-time Date Parsing
+    now = None
+    if current_date:
+        try:
+            now = datetime.datetime.fromisoformat(current_date.replace('Z', '+00:00'))
+        except Exception:
+            now = None
+    if not now:
+        now = datetime.datetime.now()
+
+    arabic_months = ['جانفي', 'فيفري', 'مارس', 'أفريل', 'ماي', 'جوان', 'جويلية', 'أوت', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+    current_date_ar = f"{now.day} {arabic_months[now.month - 1]} {now.year}"
+    current_date_iso = now.strftime("%Y-%m-%d")
+    current_time_str = now.strftime("%H:%M")
+    current_year = now.year
+
     user_query_clean = user_query.strip()
     persona_key = persona if persona in PERSONA_PROFILES else 'citoyen'
     p_info = PERSONA_PROFILES[persona_key]
@@ -351,15 +370,23 @@ def ask_legal_agent(user_query, lang="ar", history=None, user_id="default_user",
 
 {p_info['instruction']}
 
+📅 التوقيت والتاريخ الفعلي للمحادثة (مرجع أساسي للآجال وسريان القوانين):
+- تاريخ اليوم: {current_date_ar} (الموافق لـ {current_date_iso})، التوقيت: {current_time_str}.
+- السنة الحالية هي: {current_year}.
+- يجب دائماً أن تعي أننا في سنة {current_year} (اليوم هو {current_date_ar}).
+- إذا سأل المستخدم عن تاريخ اليوم، أو متى نحن، أو "هذا العام"، أجب بدقة استناداً لهذا التاريخ ({current_date_ar}).
+- احسب الآجال الإجرائية (آجال الاستئناف 15 أو 30 يوماً، المعارضة 10 أيام، الطعن بالنقض شهرين، التقادم، مدة عقود العمل والإيجار) انطلاقاً من تاريخ اليوم أو التواريخ المذكورة في سؤاله.
+- اعتبر دائماً أن أحدث قانون مالية ساري المفعول حالياً هو قانون المالية لسنة {current_year}، وأن أحدث التعديلات التشريعية (مثل تعديلات {current_year}) هي السارية المفعول.
+
 قواعد صارمة للإجابة والتفاعل الإنساني الذكي:
 1. التفاعل الطبيعي والحيوي (ممنوع منعاً باتاً الردود الآلية المبرمجة أو القوالب الجاهزة أو التكرار):
    - تفاعل بذكاء، حيوية وبشكل إنساني طبيعي مع رسالة المستخدم.
-   - إذا كان كلام المستخدم تحية أو دردشة أو كلاماً عاماً: رد عليه بأسلوب لبق وطبيعي واعرض مساعدتك القانونية المتخصصة دون قوالب جامدة.
+   - إذا كان كلام المستخدم تحية أو دردشة أو سؤالاً عن الوقت/التاريخ: رد عليه بأسلوب لبق وطبيعي واذكر له التاريخ إذا طلبه.
    - إذا تحدث المستخدم بالدارجة الجزائرية (عربيزي أو أحرف لاتينية) أو الفرنسية أو العربية الفصحى: تفاعل معه بسلاسة بنفس لغته وسياقه الطبيعي.
 
-2. في الاستشارات والمسائل القانونية:
+2. في الاستشارات والمسائل القانونية وحساب الآجال:
    - قدّم جواباً قانونياً مباشراً، مركزاً وواضحاً ومفيداً عملياً دون إطالة إنشائية لا فائدة منها.
-   - اذكر الرقم، الأجل، المبالغ بالدينار (DA)، أو رقم المادة بدقة إن وجدت.
+   - اذكر الرقم، الأجل، المبالغ بالدينار (DA)، أو رقم المادة بدقة إن وجدت، مع توضيح التاريخ النهائي للأجل (Date limite) بحسابه من تاريخ اليوم ({current_date_iso}).
    - استند دائماً إلى نصوص التشريع الجزائري الساري واجتهادات المحكمة العليا إن وُجدت، واختم جوابك بذكر المصدر الرسمي بدقة:
      ---
      📌 **المصدر:** [اسم القانون أو المرسوم، رقم المادة / الجريدة الرسمية / قرار المحكمة العليا].
@@ -368,11 +395,13 @@ def ask_legal_agent(user_query, lang="ar", history=None, user_id="default_user",
     user_prompt = f"""رسالة واستفسار المستخدم:
 "{user_query}"
 
+[التاريخ الحالي للمحادثة: {current_date_ar} ({current_date_iso}) - سنة {current_year}]
+
 {f"النصوص القانونية الرسمية من قاعدة البيانات:\n{context_str}" if context_str else ""}
 {f"اجتهادات المحكمة العليا:\n{jurisprudence_str}" if jurisprudence_str else ""}
 {f"سياق سابق للمستخدم: {memory_str}" if memory_str else ""}
 
-أجب بذكاء وطبيعية وبشكل مباشر دون أي ردود آلية أو قوالب مسبقة."""
+أجب بذكاء وطبيعية وبشكل مباشر، مع مراعاة تاريخ اليوم ({current_date_ar}) وحساب أي آجال أو قوانين سارية بدقة."""
 
     # Build multi-turn contents for Gemini
     gemini_contents = []

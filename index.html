@@ -4033,7 +4033,8 @@
                 body: JSON.stringify({ 
                     query: msgText,
                     history: historyTurns,
-                    persona: currentUserPersona
+                    persona: currentUserPersona,
+                    current_date: new Date().toISOString()
                 })
             })
             .then(res => res.json())
