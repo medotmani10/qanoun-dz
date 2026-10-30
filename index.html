@@ -214,11 +214,11 @@
                             <div class="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 shadow-2xs">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                             </div>
-                            <span class="text-[10px] bg-white/25 backdrop-blur-xs px-2 py-0.5 rounded-full font-bold">59 سنة</span>
+                            <span class="text-[10px] bg-white/25 backdrop-blur-xs px-2 py-0.5 rounded-full font-bold">59 قانوناً</span>
                         </div>
                         <div class="mt-3 relative z-10">
                             <div class="text-xs font-bold leading-tight">المكتبة القانونية</div>
-                            <div class="text-[9px] text-emerald-100 mt-0.5 font-medium">4,588 جريدة رسمية و 37 قانون</div>
+                            <div class="text-[9px] text-emerald-100 mt-0.5 font-medium">59 قانوناً مدوناً • 6,012 مادة رسمية</div>
                         </div>
                     </div>
 
@@ -247,34 +247,64 @@
                     </div>
 
                     <div class="flex space-x-reverse space-x-3 overflow-x-auto no-scrollbar pb-1">
-                        <!-- Law 1 -->
-                        <div onclick="openDocumentView('قانون 25-17', 'قانون المالية لسنة 2026', 'الاستيراد المصغر، إعفاءات TVA ورسم IFU 0.5%')" class="min-w-[210px] bg-white border border-slate-200 rounded-2xl p-3 shadow-sm hover:border-emerald-500 cursor-pointer transition-all active:scale-95 shrink-0">
+                        <!-- Law 1: Penal Code Oct 2026 -->
+                        <div onclick="openLatest2026Law('26-13')" class="min-w-[220px] bg-white border border-slate-200 rounded-2xl p-3 shadow-xs hover:border-emerald-500 cursor-pointer transition-all active:scale-95 shrink-0 hover:shadow-sm">
                             <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-[9px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md">قانون 25-17</span>
+                                <span class="text-[9px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">قانون 26-13</span>
+                                <span class="text-[9px] text-slate-400">12 أكتوبر 2026</span>
+                            </div>
+                            <div class="text-xs font-bold text-slate-900 line-clamp-1">تعديل قانون العقوبات 2026</div>
+                            <div class="text-[10px] text-slate-500 mt-1 line-clamp-2">تشديد عقوبات الاختطاف، مكافحة حرائق الغابات والإرهاب البيئي.</div>
+                        </div>
+
+                        <!-- Law 2: Commercial Registry June 2026 -->
+                        <div onclick="openLatest2026Law('26-12')" class="min-w-[220px] bg-white border border-slate-200 rounded-2xl p-3 shadow-xs hover:border-emerald-500 cursor-pointer transition-all active:scale-95 shrink-0 hover:shadow-sm">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">قانون 26-12</span>
+                                <span class="text-[9px] text-slate-400">8 جوان 2026</span>
+                            </div>
+                            <div class="text-xs font-bold text-slate-900 line-clamp-1">ممارسة الأنشطة التجارية</div>
+                            <div class="text-[10px] text-slate-500 mt-1 line-clamp-2">السجل التجاري الإلكتروني، الشباك الموحد، ومهلة الشهر الإلزامية.</div>
+                        </div>
+
+                        <!-- Law 3: Traffic Code May 2026 -->
+                        <div onclick="openLatest2026Law('26-09')" class="min-w-[220px] bg-white border border-slate-200 rounded-2xl p-3 shadow-xs hover:border-emerald-500 cursor-pointer transition-all active:scale-95 shrink-0 hover:shadow-sm">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[9px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">قانون 26-09</span>
+                                <span class="text-[9px] text-slate-400">12 ماي 2026</span>
+                            </div>
+                            <div class="text-xs font-bold text-slate-900 line-clamp-1">قانون المرور الجديد 2026</div>
+                            <div class="text-[10px] text-slate-500 mt-1 line-clamp-2">نظام رخصة السياقة بالتنقيط، تشديد الغرامات وسحب الرخص الفوري.</div>
+                        </div>
+
+                        <!-- Law 4: Territorial Division April 2026 -->
+                        <div onclick="openLatest2026Law('26-06')" class="min-w-[220px] bg-white border border-slate-200 rounded-2xl p-3 shadow-xs hover:border-emerald-500 cursor-pointer transition-all active:scale-95 shrink-0 hover:shadow-sm">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[9px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">قانون 26-06</span>
+                                <span class="text-[9px] text-slate-400">4 أفريل 2026</span>
+                            </div>
+                            <div class="text-xs font-bold text-slate-900 line-clamp-1">التقسيم والترقية الإقليمية</div>
+                            <div class="text-[10px] text-slate-500 mt-1 line-clamp-2">ترقية المقاطعات الإدارية، صلاحيات الجماعات المحلية والولاة.</div>
+                        </div>
+
+                        <!-- Law 5: Constitutional Revision March 2026 -->
+                        <div onclick="openLatest2026Law('26-04')" class="min-w-[220px] bg-white border border-slate-200 rounded-2xl p-3 shadow-xs hover:border-emerald-500 cursor-pointer transition-all active:scale-95 shrink-0 hover:shadow-sm">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[9px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200">قانون 26-04</span>
+                                <span class="text-[9px] text-slate-400">26 مارس 2026</span>
+                            </div>
+                            <div class="text-xs font-bold text-slate-900 line-clamp-1">التعديل الدستوري 2026</div>
+                            <div class="text-[10px] text-slate-500 mt-1 line-clamp-2">استقلالية القضاء، ضمانات الحريات الفردية والمحكمة الدستورية.</div>
+                        </div>
+
+                        <!-- Law 6: Finance Law 2026 -->
+                        <div onclick="openLatest2026Law('25-17')" class="min-w-[220px] bg-white border border-slate-200 rounded-2xl p-3 shadow-xs hover:border-emerald-500 cursor-pointer transition-all active:scale-95 shrink-0 hover:shadow-sm">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[9px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200">قانون 25-17</span>
                                 <span class="text-[9px] text-slate-400">14 ديسمبر 2025</span>
                             </div>
-                            <div class="text-xs font-bold text-slate-900 line-clamp-1">قانون المالية 2026</div>
-                            <div class="text-[10px] text-slate-500 mt-1 line-clamp-2">الاستيراد المصغر للمقاول الذاتي، إعفاءات TVA ورسم 0.5%.</div>
-                        </div>
-
-                        <!-- Law 2 -->
-                        <div onclick="openDocumentView('قانون 24-06', 'تعديل قانون العقوبات', 'العقوبات البديلة، حماية المسير العام، محاربة الفساد')" class="min-w-[210px] bg-white border border-slate-200 rounded-2xl p-3 shadow-sm hover:border-emerald-500 cursor-pointer transition-all active:scale-95 shrink-0">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-[9px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md">قانون 24-06</span>
-                                <span class="text-[9px] text-slate-400">28 أبريل 2024</span>
-                            </div>
-                            <div class="text-xs font-bold text-slate-900 line-clamp-1">تعديل قانون العقوبات</div>
-                            <div class="text-[10px] text-slate-500 mt-1 line-clamp-2">العقوبات البديلة، حماية المسير، تجريم التعدي على الأموال.</div>
-                        </div>
-
-                        <!-- Law 3 -->
-                        <div onclick="openDocumentView('قانون 23-18', 'حماية أراضي الدولة والمحافظة عليها', 'عقوبات صارمة على البناء غير المرخص وبيع أراضي الدولة')" class="min-w-[210px] bg-white border border-slate-200 rounded-2xl p-3 shadow-sm hover:border-emerald-500 cursor-pointer transition-all active:scale-95 shrink-0">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-[9px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">قانون 23-18</span>
-                                <span class="text-[9px] text-slate-400">28 نوفمبر 2023</span>
-                            </div>
-                            <div class="text-xs font-bold text-slate-900 line-clamp-1">حماية أراضي الدولة</div>
-                            <div class="text-[10px] text-slate-500 mt-1 line-clamp-2">من 5 إلى 20 سنة حبس لكل تعدٍ أو بناء غير مرخص.</div>
+                            <div class="text-xs font-bold text-slate-900 line-clamp-1">قانون المالية لسنة 2026</div>
+                            <div class="text-[10px] text-slate-500 mt-1 line-clamp-2">إعفاءات رسم IFU 0.5%، الاستيراد المصغر للمقاول الذاتي وTVA.</div>
                         </div>
                     </div>
                 </div>
@@ -855,7 +885,7 @@
                             <span class="text-base">📚</span>
                             <div>
                                 <div class="font-bold text-slate-800">قواعد البيانات القانونية</div>
-                                <div class="text-[10px] text-slate-400">الجريدة الرسمية (4,588)، المحكمة العليا (84)</div>
+                                <div class="text-[10px] text-slate-400">الجريدة الرسمية (6,012 مادة)، المحكمة العليا (89 قراراً)</div>
                             </div>
                         </div>
                         <svg class="w-4 h-4 text-slate-400 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
@@ -3139,6 +3169,23 @@
         function renderLawsList(list) {
             // Keep for backwards compatibility
             loadLibraryLaws(null);
+        }
+
+        // LATEST 2026 OFFICIAL LAWS QUICK ACCESS
+        const LATEST_2026_LAWS = {
+            '26-13': "Code Penal - Dernier Amendement d'Octobre 2026 (Loi n° 26-13 du 12 octobre 2026)",
+            '26-12': "Conditions d'Exercice des Activites Commerciales (Loi n° 26-12 du 8 juin 2026)",
+            '26-09': "Nouveau Code de la Route 2026 (Loi n° 26-09 du 12 mai 2026)",
+            '26-06': "Organisation Territoriale et Decoupage (Loi n° 26-06 du 4 avril 2026)",
+            '26-04': "Revision Constitutionnelle de 2026 (Loi n° 26-04 du 26 mars 2026)",
+            '25-17': "Loi de Finances pour 2026 (Loi n° 25-17 du 14 decembre 2025)"
+        };
+
+        function openLatest2026Law(code) {
+            const title = LATEST_2026_LAWS[code];
+            if (title && typeof openRealLawArticlesModal === 'function') {
+                openRealLawArticlesModal(title);
+            }
         }
 
         // LEGAL TEMPLATES & DOSSIERS SYSTEM (27 OFFICIAL TEMPLATES)
