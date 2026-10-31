@@ -701,6 +701,17 @@ class LegalRequestHandler(http.server.BaseHTTPRequestHandler):
             offset = int(qs.get('offset', ['0'])[0])
             juris_data = library_service.get_library_jurisprudence(search, limit, offset)
             self.send_json_response(200, juris_data)
+        elif path_only == '/api/library/translate-article':
+            art_id = qs.get('id', [None])[0]
+            if not art_id:
+                self.send_json_response(400, {'error': 'Missing article id parameter'})
+                return
+            try:
+                art_id = int(art_id)
+                res = library_service.translate_article(art_id)
+                self.send_json_response(200, res)
+            except Exception as e:
+                self.send_json_response(500, {'error': str(e)})
         else:
             self.send_response(404)
             self.send_cors_headers()
@@ -738,6 +749,17 @@ class LegalRequestHandler(http.server.BaseHTTPRequestHandler):
             try:
                 global_memory.clear_all('default_user')
                 self.send_json_response(200, {'status': 'ok'})
+            except Exception as e:
+                self.send_json_response(500, {'error': str(e)})
+        elif self.path == '/api/library/translate-article':
+            req_json, err = self.read_json_body()
+            if err:
+                self.send_json_response(400, {'error': err})
+                return
+            try:
+                art_id = int(req_json.get('id', req_json.get('article_id', 0)))
+                res = library_service.translate_article(art_id)
+                self.send_json_response(200, res)
             except Exception as e:
                 self.send_json_response(500, {'error': str(e)})
         else:

@@ -38,10 +38,23 @@ _thread_local = threading.local()
 _cache_lock = threading.Lock()
 _overview_cache = None
 
+def ensure_db_schema(conn):
+    try:
+        c = conn.cursor()
+        cols = [r[1] for r in c.execute('PRAGMA table_info(consolidated_laws)').fetchall()]
+        if 'content_ar' not in cols:
+            c.execute('ALTER TABLE consolidated_laws ADD COLUMN content_ar TEXT')
+        if 'title_ar' not in cols:
+            c.execute('ALTER TABLE consolidated_laws ADD COLUMN title_ar TEXT')
+        conn.commit()
+    except Exception:
+        pass
+
 def get_db():
     if not hasattr(_thread_local, 'conn') or _thread_local.conn is None:
         _thread_local.conn = sqlite3.connect(DB_PATH, check_same_thread=False)
         _thread_local.conn.row_factory = sqlite3.Row
+        ensure_db_schema(_thread_local.conn)
     return _thread_local.conn
 
 def get_library_overview():
@@ -183,7 +196,7 @@ def get_library_articles(law_title=None, domain_key=None, search=None, limit=25,
 
     # Fetch page
     fetch_sql = f"""
-        SELECT id, domain, title, article_num, content 
+        SELECT id, domain, title, article_num, content, content_ar, title_ar 
         FROM consolidated_laws{where_sql} 
         ORDER BY id ASC 
         LIMIT ? OFFSET ?
@@ -197,8 +210,10 @@ def get_library_articles(law_title=None, domain_key=None, search=None, limit=25,
             'id': r['id'],
             'domain': r['domain'],
             'title': r['title'],
+            'title_ar': r['title_ar'],
             'article_num': r['article_num'],
-            'content': r['content']
+            'content': r['content'],
+            'content_ar': r['content_ar']
         })
 
     return {
@@ -208,6 +223,89 @@ def get_library_articles(law_title=None, domain_key=None, search=None, limit=25,
         'limit': limit,
         'has_more': (offset + len(articles)) < total,
         'articles': articles
+    }
+
+def translate_article(article_id):
+    """
+    Translates a law article to official Algerian Arabic using Gemini API.
+    Caches the translation in consolidated_laws (content_ar) for instant subsequent lookups.
+    """
+    conn = get_db()
+    c = conn.cursor()
+
+    row = c.execute("SELECT id, title, article_num, content, content_ar, title_ar FROM consolidated_laws WHERE id = ?", (article_id,)).fetchone()
+    if not row:
+        return {'status': 'error', 'message': f'Article #{article_id} non trouvé.'}
+
+    # 1. Check if already translated and cached
+    if row['content_ar'] and len(row['content_ar'].strip()) > 0:
+        return {
+            'status': 'ok',
+            'id': row['id'],
+            'title': row['title'],
+            'title_ar': row['title_ar'] or row['title'],
+            'article_num': row['article_num'],
+            'content_ar': row['content_ar'],
+            'content_fr': row['content'],
+            'cached': True
+        }
+
+    # 2. Call Gemini for official Algerian legal translation
+    from legal_agent import call_gemini
+
+    title = row['title']
+    article_num = row['article_num']
+    content_fr = row['content']
+
+    prompt = f"""أنت مترجم قانوني معتمد لدى المحكمة العليا والجريدة الرسمية للجمهورية الجزائرية الديمقراطية الشعبية.
+قم بترجمة المادة القانونية التالية من الفرنسية إلى اللغة العربية الرسمية الدقيقة المعتمدة في الجريدة الرسمية الجزائرية JORADP.
+
+قواعد صارمة:
+1. حافظ على ترقيم المادة بدقة (مثلاً: المادة 1، المادة 2...).
+2. استخدم المصطلحات القانونية الجزائرية المعتمدة في النصوص التشريعية الجزائرية.
+3. ترجم النص بأمانة بدون أي تحريف وبدون أي تعليق جانبي أو مقدمات.
+
+القانون:
+{title}
+
+المادة:
+{article_num}
+
+النص بالفرنسية:
+{content_fr}
+
+المطلوب:
+اكتب الترجمة العربية الرسمية للمادة مباشرة فقط."""
+
+    translated_text = call_gemini(prompt, allow_arabic=True)
+    if not translated_text or translated_text.startswith("[Erreur"):
+        return {'status': 'error', 'message': translated_text or 'Échec de la traduction.'}
+
+    translated_text = translated_text.strip()
+
+    title_ar = row['title_ar']
+    if not title_ar:
+        title_prompt = f"ترجم عنوان هذا القانون الجزائري إلى العربية الرسمية فقط بدون مقدمات:\n{title}"
+        t_ar = call_gemini(title_prompt, allow_arabic=True)
+        if t_ar and not t_ar.startswith("[Erreur"):
+            title_ar = t_ar.strip()
+
+    # 3. Cache into SQLite database
+    try:
+        c.execute("UPDATE consolidated_laws SET content_ar = ?, title_ar = ? WHERE id = ?", (translated_text, title_ar, article_id))
+        conn.commit()
+    except Exception as e:
+        print(f"Error caching translation for article {article_id}: {e}")
+
+    return {
+        'status': 'ok',
+        'id': row['id'],
+        'title': row['title'],
+        'title_ar': title_ar or row['title'],
+        'article_num': row['article_num'],
+        'content_ar': translated_text,
+        'content_fr': content_fr,
+        'cached': False
     }
 
 def get_library_jurisprudence(search=None, limit=20, offset=0):

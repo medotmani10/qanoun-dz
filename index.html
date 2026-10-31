@@ -2813,26 +2813,50 @@
                 return;
             }
 
+            window.lawArticlesCache = window.lawArticlesCache || {};
+            articles.forEach(art => {
+                window.lawArticlesCache[art.id] = art;
+                if (!art._currentLang) {
+                    art._currentLang = art.content_ar ? 'ar' : 'fr';
+                }
+            });
+
             const html = articles.map(art => {
                 const safeNum = escapeHtml(art.article_num);
                 const safeTitle = escapeHtml(art.title);
-                const safeContent = highlightText(escapeHtml(art.content), query);
+                const isAr = art._currentLang === 'ar' && art.content_ar;
+                const displayText = isAr ? art.content_ar : art.content;
+                const safeContent = highlightText(escapeHtml(displayText), query);
+
+                const btnLabel = isAr ? '🇫🇷 النص الأصلي' : (art.content_ar ? '🇩🇿 العربية' : '🌐 ترجمة');
+                const btnClass = isAr 
+                    ? 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100'
+                    : 'bg-emerald-50 text-emerald-900 border-emerald-200 hover:bg-emerald-100';
 
                 return `
-                    <div class="bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-xs hover:border-amber-400 transition-all space-y-2">
+                    <div id="search-card-${art.id}" class="bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-xs hover:border-amber-400 transition-all space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="text-[10px] font-black text-amber-800 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">
                                 ${safeNum}
                             </span>
-                            <span class="text-[9px] font-medium text-slate-400 truncate max-w-[200px]">
-                                ${safeTitle}
-                            </span>
+                            <div class="flex items-center space-x-reverse space-x-1.5">
+                                <button id="search-trans-btn-${art.id}" onclick="toggleArticleLanguage(${art.id}, 'search')" class="px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-all active:scale-95 flex items-center space-x-reverse space-x-1 ${btnClass}">
+                                    <span id="search-trans-label-${art.id}">${btnLabel}</span>
+                                </button>
+                                <span class="text-[9px] font-medium text-slate-400 truncate max-w-[140px]">
+                                    ${safeTitle}
+                                </span>
+                            </div>
                         </div>
-                        <div class="text-xs text-slate-800 leading-relaxed max-h-36 overflow-y-auto no-scrollbar font-normal p-2 bg-slate-50 rounded-xl border border-slate-100">
+                        <div id="search-content-${art.id}" class="text-xs ${isAr ? 'text-emerald-950 font-medium' : 'text-slate-800 font-normal'} leading-relaxed max-h-36 overflow-y-auto no-scrollbar p-2 ${isAr ? 'bg-emerald-50/40 border-emerald-100' : 'bg-slate-50 border-slate-100'} rounded-xl border" ${isAr ? 'dir="rtl"' : 'dir="ltr"'}>
                             ${safeContent}
                         </div>
+                        <div id="search-badge-${art.id}" class="${isAr ? 'flex items-center space-x-reverse space-x-1 text-[9px] text-emerald-700 font-medium' : 'hidden'}">
+                            <span>✅</span>
+                            <span>ترجمة قانونية مطابقة للمصطلحات الرسمية (JORADP)</span>
+                        </div>
                         <div class="flex items-center justify-between pt-1 text-[10px]">
-                            <button onclick="safeCopyToClipboard('${escapeQuotes(art.content)}', 'تم نسخ نص المادة بنجاح!')" class="text-slate-500 hover:text-slate-800 font-bold flex items-center space-x-reverse space-x-1">
+                            <button onclick="copyArticleContent(${art.id})" class="text-slate-500 hover:text-slate-800 font-bold flex items-center space-x-reverse space-x-1">
                                 <span>📋 نسخ النص</span>
                             </button>
                             <button onclick="consultArticleInChat('${escapeQuotes(art.title)}', '${escapeQuotes(art.article_num)}')" class="text-forest-800 font-bold hover:underline">
@@ -3010,10 +3034,14 @@
                         <div class="text-xs font-bold">${escapeHtml(lawTitle)}</div>
                         <div class="text-[10px] text-emerald-700 mt-0.5">النصوص والمواد الرسمية الكاملة المعتمدة فضاء السحب</div>
                     </div>
-                    <!-- Quick In-Law Search -->
+                    <!-- Quick In-Law Search & Translation Bar -->
                     <div class="bg-white border border-slate-200 rounded-xl p-2 flex items-center space-x-reverse space-x-2 sticky top-0 z-10 shadow-xs">
                         <svg class="w-4 h-4 text-slate-400 mr-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        <input id="reader-law-art-search" oninput="onReaderSearchInput(this.value)" type="text" placeholder="ابحث برقم المادة (مثال: مادة 46) أو كلمة داخل هذا القانون..." class="flex-1 bg-transparent text-xs outline-none text-slate-900 placeholder-slate-400">
+                        <input id="reader-law-art-search" oninput="onReaderSearchInput(this.value)" type="text" placeholder="ابحث برقم المادة أو كلمة داخل هذا القانون..." class="flex-1 bg-transparent text-xs outline-none text-slate-900 placeholder-slate-400">
+                        <button onclick="translateAllVisibleArticles()" class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-850 text-[10px] font-bold rounded-lg border border-emerald-200 shrink-0 transition-all active:scale-95 flex items-center space-x-reverse space-x-1" title="ترجمة المواد المعروضة للعربية">
+                            <span>🇩🇿</span>
+                            <span id="trans-all-label">ترجمة المعروض</span>
+                        </button>
                     </div>
                     <div id="reader-articles-container" class="space-y-3 pt-1">
                         <div class="py-8 text-center text-slate-400">
@@ -3077,21 +3105,46 @@
                 return;
             }
 
+            window.lawArticlesCache = window.lawArticlesCache || {};
+            articles.forEach(art => {
+                window.lawArticlesCache[art.id] = art;
+                if (!art._currentLang) {
+                    art._currentLang = (art.content_ar && art.content_ar.trim().length > 0) ? 'ar' : 'fr';
+                }
+            });
+
             const html = articles.map(art => {
                 const safeNum = escapeHtml(art.article_num);
-                const safeContent = escapeHtml(art.content);
+                const isAr = art._currentLang === 'ar' && art.content_ar;
+                const displayText = isAr ? art.content_ar : art.content;
+                const safeContent = escapeHtml(displayText);
+
+                const btnLabel = isAr ? '🇫🇷 النص الأصلي' : (art.content_ar ? '🇩🇿 العربية' : '🌐 ترجمة');
+                const btnClass = isAr 
+                    ? 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100'
+                    : 'bg-emerald-50 text-emerald-900 border-emerald-200 hover:bg-emerald-100';
+
                 return `
-                    <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs space-y-2">
+                    <div id="art-card-${art.id}" class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-black text-forest-900 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200">
                                 ${safeNum}
                             </span>
-                            <button onclick="safeCopyToClipboard('${escapeQuotes(art.content)}', 'تم نسخ نص ${escapeQuotes(art.article_num)} بنجاح!')" class="text-slate-400 hover:text-slate-700 text-xs flex items-center space-x-reverse space-x-1" title="نسخ">
-                                <span>📋 نسخ</span>
-                            </button>
+                            <div class="flex items-center space-x-reverse space-x-1.5">
+                                <button id="trans-btn-${art.id}" onclick="toggleArticleLanguage(${art.id}, 'art')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all active:scale-95 flex items-center space-x-reverse space-x-1 ${btnClass}">
+                                    <span id="trans-label-${art.id}">${btnLabel}</span>
+                                </button>
+                                <button onclick="copyArticleContent(${art.id})" class="p-1.5 text-slate-400 hover:text-slate-700 text-xs rounded-lg hover:bg-slate-100 transition-all" title="نسخ">
+                                    <span>📋</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="text-xs text-slate-800 leading-relaxed font-normal whitespace-pre-line p-2.5 bg-slate-50/70 rounded-xl border border-slate-100">
+                        <div id="art-content-${art.id}" class="text-xs ${isAr ? 'text-emerald-950 font-medium' : 'text-slate-800 font-normal'} leading-relaxed whitespace-pre-line p-2.5 ${isAr ? 'bg-emerald-50/40 border-emerald-100' : 'bg-slate-50/70 border-slate-100'} rounded-xl border transition-all" ${isAr ? 'dir="rtl"' : 'dir="ltr"'}>
                             ${safeContent}
+                        </div>
+                        <div id="art-badge-${art.id}" class="${isAr ? 'flex items-center space-x-reverse space-x-1 text-[9px] text-emerald-700 font-medium' : 'hidden'}">
+                            <span>✅</span>
+                            <span>ترجمة قانونية معتمدة للجريدة الرسمية (JORADP)</span>
                         </div>
                         <div class="flex items-center justify-end pt-1">
                             <button onclick="consultArticleInChat('${escapeQuotes(art.title)}', '${escapeQuotes(art.article_num)}')" class="text-[11px] font-bold text-forest-800 hover:underline">
@@ -3107,6 +3160,138 @@
             } else {
                 container.innerHTML = html;
             }
+        }
+
+        async function toggleArticleLanguage(artId, prefix = 'art') {
+            window.lawArticlesCache = window.lawArticlesCache || {};
+            const art = window.lawArticlesCache[artId];
+            if (!art) return;
+
+            const btn = document.getElementById(prefix === 'search' ? `search-trans-btn-${artId}` : `trans-btn-${artId}`);
+            const label = document.getElementById(prefix === 'search' ? `search-trans-label-${artId}` : `trans-label-${artId}`);
+            const contentDiv = document.getElementById(prefix === 'search' ? `search-content-${artId}` : `art-content-${artId}`);
+            const badgeDiv = document.getElementById(prefix === 'search' ? `search-badge-${artId}` : `art-badge-${artId}`);
+
+            // 1. If currently showing Arabic, toggle back to French original
+            if (art._currentLang === 'ar') {
+                art._currentLang = 'fr';
+                if (contentDiv) {
+                    contentDiv.innerText = art.content;
+                    contentDiv.setAttribute('dir', 'ltr');
+                    contentDiv.className = prefix === 'search' 
+                        ? 'text-xs text-slate-800 font-normal leading-relaxed max-h-36 overflow-y-auto no-scrollbar p-2 bg-slate-50 border-slate-100 rounded-xl border'
+                        : 'text-xs text-slate-800 font-normal leading-relaxed whitespace-pre-line p-2.5 bg-slate-50/70 border-slate-100 rounded-xl border transition-all';
+                }
+                if (btn) {
+                    btn.className = prefix === 'search'
+                        ? 'px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-all active:scale-95 flex items-center space-x-reverse space-x-1 bg-emerald-50 text-emerald-900 border-emerald-200 hover:bg-emerald-100'
+                        : 'px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all active:scale-95 flex items-center space-x-reverse space-x-1 bg-emerald-50 text-emerald-900 border-emerald-200 hover:bg-emerald-100';
+                }
+                if (label) label.innerText = art.content_ar ? '🇩🇿 العربية' : '🌐 ترجمة';
+                if (badgeDiv) badgeDiv.classList.add('hidden');
+                return;
+            }
+
+            // 2. Currently showing French: toggle to Arabic
+            if (art.content_ar && art.content_ar.trim().length > 0) {
+                art._currentLang = 'ar';
+                if (contentDiv) {
+                    contentDiv.innerText = art.content_ar;
+                    contentDiv.setAttribute('dir', 'rtl');
+                    contentDiv.className = prefix === 'search'
+                        ? 'text-xs text-emerald-950 font-medium leading-relaxed max-h-36 overflow-y-auto no-scrollbar p-2 bg-emerald-50/40 border-emerald-100 rounded-xl border'
+                        : 'text-xs text-emerald-950 font-medium leading-relaxed whitespace-pre-line p-2.5 bg-emerald-50/40 border-emerald-100 rounded-xl border transition-all';
+                }
+                if (btn) {
+                    btn.className = prefix === 'search'
+                        ? 'px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-all active:scale-95 flex items-center space-x-reverse space-x-1 bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100'
+                        : 'px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all active:scale-95 flex items-center space-x-reverse space-x-1 bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100';
+                }
+                if (label) label.innerText = '🇫🇷 النص الأصلي';
+                if (badgeDiv) {
+                    badgeDiv.className = 'flex items-center space-x-reverse space-x-1 text-[9px] text-emerald-700 font-medium';
+                    badgeDiv.innerHTML = '<span>✅</span><span>ترجمة قانونية معتمدة للجريدة الرسمية (JORADP)</span>';
+                    badgeDiv.classList.remove('hidden');
+                }
+                return;
+            }
+
+            // 3. Not yet translated: fetch translation from server API
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('opacity-75');
+            }
+            if (label) {
+                label.innerHTML = '<span class="inline-block animate-spin mr-1">⏳</span> جاري...';
+            }
+
+            try {
+                const res = await fetch(`/api/library/translate-article?id=${artId}`);
+                const data = await res.json();
+
+                if (data.status === 'ok' && data.content_ar) {
+                    art.content_ar = data.content_ar;
+                    art.title_ar = data.title_ar;
+                    art._currentLang = 'ar';
+
+                    if (contentDiv) {
+                        contentDiv.innerText = data.content_ar;
+                        contentDiv.setAttribute('dir', 'rtl');
+                        contentDiv.className = prefix === 'search'
+                            ? 'text-xs text-emerald-950 font-medium leading-relaxed max-h-36 overflow-y-auto no-scrollbar p-2 bg-emerald-50/40 border-emerald-100 rounded-xl border'
+                            : 'text-xs text-emerald-950 font-medium leading-relaxed whitespace-pre-line p-2.5 bg-emerald-50/40 border-emerald-100 rounded-xl border transition-all';
+                    }
+                    if (btn) {
+                        btn.className = prefix === 'search'
+                            ? 'px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-all active:scale-95 flex items-center space-x-reverse space-x-1 bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100'
+                            : 'px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all active:scale-95 flex items-center space-x-reverse space-x-1 bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100';
+                    }
+                    if (label) label.innerText = '🇫🇷 النص الأصلي';
+                    if (badgeDiv) {
+                        badgeDiv.className = 'flex items-center space-x-reverse space-x-1 text-[9px] text-emerald-700 font-medium';
+                        badgeDiv.innerHTML = `<span>✅</span><span>${data.cached ? 'مسترجع من الأرشيف المعتمد' : 'تمت الترجمة القانونية وحفظها'}</span>`;
+                        badgeDiv.classList.remove('hidden');
+                    }
+                } else {
+                    alert('تعذرت ترجمة المادة حالياً: ' + (data.message || 'خطأ غير معروف'));
+                    if (label) label.innerText = '🌐 ترجمة';
+                }
+            } catch (err) {
+                console.error('Translation error:', err);
+                alert('حدث خطأ في الاتصال أثناء طلب الترجمة.');
+                if (label) label.innerText = '🌐 ترجمة';
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75');
+                }
+            }
+        }
+
+        function copyArticleContent(artId) {
+            window.lawArticlesCache = window.lawArticlesCache || {};
+            const art = window.lawArticlesCache[artId];
+            if (!art) return;
+            const textToCopy = (art._currentLang === 'ar' && art.content_ar) ? art.content_ar : art.content;
+            safeCopyToClipboard(textToCopy, `تم نسخ نص ${art.article_num} بنجاح!`);
+        }
+
+        async function translateAllVisibleArticles() {
+            const btnLabel = document.getElementById('trans-all-label');
+            if (btnLabel) btnLabel.innerText = 'جاري الترجمة...';
+
+            const articles = LibraryState.reader.articles || [];
+            for (const art of articles) {
+                if (art._currentLang !== 'ar') {
+                    await toggleArticleLanguage(art.id, 'art');
+                    await new Promise(r => setTimeout(r, 150));
+                }
+            }
+
+            if (btnLabel) btnLabel.innerText = 'تمت الترجمة ✅';
+            setTimeout(() => {
+                if (btnLabel) btnLabel.innerText = 'ترجمة المعروض';
+            }, 3000);
         }
 
         function handleReaderInfiniteScroll(e) {
